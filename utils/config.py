@@ -240,13 +240,20 @@ def get_aws_config() -> Dict[str, Any]:
     config = load_config()
     aws_config = config.get('aws', {})
     
-    # Fallback to environment variables if not in config.yaml
-    # USE_S3 defaults to FALSE (local mode) for easier debugging
+    # Priority: env var USE_S3 / FORCE_S3_IO -> config.yaml force_s3_io -> config.yaml use_s3 -> True if bucket exists
+    use_s3_env = os.getenv('USE_S3', os.getenv('FORCE_S3_IO', '')).lower()
+    if use_s3_env in ('false', '0', 'no', 'off'):
+        force_s3 = False
+    elif use_s3_env in ('true', '1', 'yes', 'on'):
+        force_s3 = True
+    else:
+        force_s3 = aws_config.get('force_s3_io', aws_config.get('use_s3', True))
+
     return {
         'region': aws_config.get('region', os.getenv('AWS_REGION', 'ap-south-1')),
         'bucket': aws_config.get('s3_bucket', os.getenv('S3_BUCKET')),
         'kms_key_arn': aws_config.get('s3_kms_key_arn', os.getenv('S3_KMS_KEY_ARN')),
-        'force_s3_io': aws_config.get('use_s3', os.getenv('USE_S3', 'false').lower() in ('true', '1', 'yes'))
+        'force_s3_io': force_s3
     }
 
 
@@ -314,7 +321,7 @@ def get_mlflow_config() -> Dict[str, Any]:
     
     tracking_uri = os.getenv('MLFLOW_TRACKING_URI') or mlflow_config.get('tracking_uri', 'http://localhost:5001')
     artifact_root = os.getenv('MLFLOW_DEFAULT_ARTIFACT_ROOT') or mlflow_config.get('artifact_root')
-    experiment_name = mlflow_config.get('experiment_name', 'Zuu Crew Churn Analysis')
+    experiment_name = mlflow_config.get('experiment_name', 'Churn Analysis')
     
     # Default artifact_root to S3 if not explicitly set
     if not artifact_root:

@@ -139,9 +139,9 @@ class IQROutlierDetection(OutlierDetectionStrategy):
             # Create outlier indicator column
             outlier_col = f"{col}_outlier"
             
-                    result_df = result_df.withColumn(
-                outlier_col,
-                (F.col(col) < lower_bound) | (F.col(col) > upper_bound)
+            result_df = result_df.withColumn(
+            outlier_col,
+            (F.col(col) < lower_bound) | (F.col(col) > upper_bound)
             )
             
             # Count outliers
@@ -208,7 +208,7 @@ class OutlierDetector:
         
             # initial_rows = len(df)
         
-            initial_rows = df.count()
+        initial_rows = df.count()
         
         if method == 'remove':
             # Add outlier indicator columns
@@ -231,8 +231,7 @@ class OutlierDetector:
                 cleaned_df = cleaned_df.drop(col)
             
                     # rows_removed = rows_to_remove.sum()
-            
-                    rows_removed = initial_rows - cleaned_df.count()
+            rows_removed = initial_rows - cleaned_df.count()
             removal_percentage = (rows_removed / initial_rows * 100) if initial_rows > 0 else 0
             
             logger.info(f"✓ Removed {rows_removed} rows with {min_outliers}+ outliers ({removal_percentage:.2f}%)")

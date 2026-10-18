@@ -200,7 +200,8 @@ class MLflowTracker:
             mlflow.sklearn.log_model(
                 sk_model=model,
                 artifact_path=artifact_path,
-                registered_model_name=self.config.get('model_registry_name', 'churn_prediction_model')
+                registered_model_name=self.config.get('model_registry_name', 'churn_prediction_model'),
+                serialization_format="cloudpickle"
             )
             
             logger.info("Logged training metrics and model to MLflow")

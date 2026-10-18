@@ -1,7 +1,7 @@
 SHELL := /usr/bin/env bash
 .ONESHELL:
 
-.PHONY: all clean install setup-dirs train-pipeline data-pipeline inference-pipeline help test
+.PHONY: all clean install setup-dirs train-pipeline data-pipeline inference-pipeline help test mlflow-up mlflow-down mlflow-ui mlflow-logs mlflow-local
 
 # Default Python interpreter
 PYTHON = python
@@ -482,6 +482,42 @@ s3-upload-data:
 # S3 smoke test (write/read roundtrip)
 s3-smoke:
 	@$(PYTHON) -c "from utils.s3_io import put_string, get_string; put_string('test-key', 'Hello S3!'); print(get_string('test-key'))"
+
+# ========================================================================================
+# MLFLOW EXPERIMENT TRACKING COMMANDS
+# ========================================================================================
+
+# Start MLflow tracking server (via Docker)
+mlflow-up:
+	@echo "🚀 Starting MLflow tracking server via Docker..."
+	@docker info >/dev/null 2>&1 || (echo "❌ Docker Desktop is not running! Please start Docker Desktop, or run 'make mlflow-local' to run MLflow without Docker." && exit 1)
+	docker-compose -f $(DOCKER_COMPOSE) up -d mlflow-tracking
+	@echo ""
+	@echo "✅ MLflow server started!"
+	@echo "🌐 MLflow UI: http://localhost:$(MLFLOW_PORT)"
+	@echo "💡 View logs: make mlflow-logs"
+
+# Run MLflow UI locally with Python (No Docker needed)
+mlflow-local:
+	@echo "🚀 Starting MLflow server locally (without Docker)..."
+	@echo "🌐 MLflow UI: http://localhost:$(MLFLOW_PORT)"
+	@echo "💡 Press Ctrl+C to stop"
+	mlflow server --backend-store-uri sqlite:///mlflow.db --port $(MLFLOW_PORT) --host 127.0.0.1 --workers 1
+
+# Stop MLflow tracking server
+mlflow-down:
+	@echo "⏹️  Stopping MLflow tracking server..."
+	docker-compose -f $(DOCKER_COMPOSE) stop mlflow-tracking
+	@echo "✅ MLflow server stopped"
+
+# View MLflow server logs
+mlflow-logs:
+	@docker-compose -f $(DOCKER_COMPOSE) logs -f mlflow-tracking
+
+# Open MLflow UI in browser
+mlflow-ui:
+	@echo "🌐 Opening MLflow UI at http://localhost:$(MLFLOW_PORT)..."
+	@start http://localhost:$(MLFLOW_PORT) 2>/dev/null || cmd.exe /c start http://localhost:$(MLFLOW_PORT) 2>/dev/null || open http://localhost:$(MLFLOW_PORT) 2>/dev/null || xdg-open http://localhost:$(MLFLOW_PORT) 2>/dev/null || echo "Please open http://localhost:$(MLFLOW_PORT) in your browser"
 
 # Test MLflow S3 integration
 test-mlflow:

@@ -308,7 +308,8 @@ def _train_sklearn_model(data_path, model_params, test_size, random_state, model
                 model,
                 "model",
                 signature=signature,
-                registered_model_name="churn_prediction_sklearn"
+                registered_model_name="churn_prediction_sklearn",
+                serialization_format="cloudpickle"
             )
             logger.info(f"✅ Model logged to MLflow successfully")
             

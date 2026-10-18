@@ -50,7 +50,7 @@ data:
 
 data_paths:
   # raw_data is now constructed dynamically from data.raw_data_file
-  # raw_data: "s3://zuucrew-mlflow-artifacts-prod/data/raw/ChurnModelling.csv"  # Legacy - use data.raw_data_file instead
+  # raw_data: "s3://mlflow-artifacts-prod/data/raw/ChurnModelling.csv"  # Legacy - use data.raw_data_file instead
   processed_data: "data/processed/ChurnModelling_Missing_Values_Handled.csv"
   imputed_data: "data/processed/imputed.csv"
   processed_dir: "data/processed"

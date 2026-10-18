@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ml-pipeline-project"
+version = "1.0.0"
+description = "Production-Ready Machine Learning Pipeline System"
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "pandas>=1.5.0",
+    "numpy>=1.21.0",
+    "scikit-learn>=1.1.0",
+    "scipy>=1.9.0",
+    "pyspark>=3.4.0",
+    "xgboost>=2.1.0",
+    "lightgbm>=3.3.0",
+    "matplotlib>=3.5.0",
+    "seaborn>=0.11.0",
+    "plotly>=5.10.0",
+    "pyyaml>=6.0",
+    "python-dotenv>=0.19.0",
+    "openpyxl>=3.0.0",
+    "xlrd>=2.0.0",
+    "fastapi>=0.95.0",
+    "uvicorn>=0.20.0",
+    "pydantic==2.10.6",
+    "pydantic-core==2.27.2",
+    "mlflow>=1.30.0",
+    "wandb>=0.15.0",
+    "boto3>=1.28.0",
+    "botocore>=1.31.0",
+    "psycopg2-binary>=2.9.0",
+    "tabulate>=0.9.0",
+    "confluent-kafka>=2.3.0",
+    "groq>=0.11.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "moto[boto3]>=4.2.0",
+    "jupyter>=1.0.0",
+    "ipykernel>=6.0.0",
+    "black>=22.0.0",
+    "flake8>=5.0.0",
+]
+
+[project.scripts]
+ml-pipeline = "pipelines.data_pipeline:main"
+ml-train = "pipelines.training_pipeline:main"
+ml-inference = "pipelines.inference_pipeline:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*", "pipelines*", "utils*"]
+namespaces = false
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "moto[boto3]>=4.2.0",
+    "jupyter>=1.0.0",
+    "ipykernel>=6.0.0",
+    "black>=22.0.0",
+    "flake8>=5.0.0",
+]

@@ -1,7 +1,7 @@
 # MLflow Tracking Server
 FROM python:3.11-slim
 
-LABEL org.opencontainers.image.source="https://github.com/zuucrew/churn-pipeline"
+LABEL org.opencontainers.image.source="https://github.com/yshanuka-dev/churn-pipeline-deployment-last"
 LABEL org.opencontainers.image.version="1.0.0"
 LABEL org.opencontainers.image.description="MLflow Tracking Server with S3 backend"
 

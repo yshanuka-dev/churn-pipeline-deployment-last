@@ -713,7 +713,7 @@ Should show:
 RDS_HOST=your-rds-endpoint.rds.amazonaws.com
 RDS_PORT=5432
 RDS_DB_NAME=analytics
-RDS_USERNAME=zuucrew
+RDS_USERNAME=yohan_shanuka
 RDS_PASSWORD=your_password
 ```
 

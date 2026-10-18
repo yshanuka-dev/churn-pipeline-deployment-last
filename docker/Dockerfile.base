@@ -2,7 +2,7 @@
 # This serves as the foundation for all ML pipeline services with embedded PySpark
 FROM python:3.11-slim AS ml-base
 
-LABEL org.opencontainers.image.source="https://github.com/zuucrew/churn-pipeline"
+LABEL org.opencontainers.image.source="https://github.com/yshanuka-dev/churn-pipeline-deployment-last"
 LABEL org.opencontainers.image.version="1.0.0"
 LABEL org.opencontainers.image.description="Base ML Pipeline with embedded PySpark and S3 integration"
 

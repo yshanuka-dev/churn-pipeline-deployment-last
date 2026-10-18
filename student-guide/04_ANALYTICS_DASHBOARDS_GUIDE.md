@@ -217,7 +217,7 @@ AWS RDS (Relational Database Service) is a managed database that AWS maintains f
 5. **Settings:**
    ```
    DB instance identifier: churn-pipeline-db
-   Master username: zuucrew
+   Master username: yohan_shanuka
    Master password: [Create a strong password!]
    Confirm password: [Same password]
    ```
@@ -322,7 +322,7 @@ Description: QuickSight access 1
 
 # Test connection
 psql -h churn-pipeline-db.xxxxxx.ap-south-1.rds.amazonaws.com \
-     -U zuucrew \
+     -U yohan_shanuka \
      -d analytics
 
 # Enter your password when prompted
@@ -348,7 +348,7 @@ Create/update your `.env` file:
 RDS_HOST=churn-pipeline-db.xxxxxx.ap-south-1.rds.amazonaws.com
 RDS_PORT=5432
 RDS_DB_NAME=analytics
-RDS_USERNAME=zuucrew
+RDS_USERNAME=yohan_shanuka
 RDS_PASSWORD=your_secure_password
 ```
 
@@ -737,7 +737,7 @@ Data source name: RDS Analytics
 Database server: churn-pipeline-db.xxxxxx.ap-south-1.rds.amazonaws.com
 Port: 5432
 Database name: analytics
-Username: zuucrew
+Username: yohan_shanuka
 Password: [your RDS password]
 ```
 

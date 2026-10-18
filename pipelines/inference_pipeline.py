@@ -424,12 +424,31 @@ def run_pandas_inference(model_timestamp=None):
             logger.warning(f"⚠️ Could not load model metadata, using model timestamp")
             data_timestamp = model_timestamp
         
-        # Load encoders and scaler (unified structure)
+        # Load encoders and scaler (unified structure with local fallback)
         encoders_key = f"artifacts/data/{data_timestamp}/encoders.pkl"
         scaler_key = f"artifacts/data/{data_timestamp}/scaler.pkl"
         
-        encoders = read_pickle(key=encoders_key, use_joblib=True)
-        scaler = read_pickle(key=scaler_key, use_joblib=True)
+        from utils.s3_io import key_exists
+        if key_exists(encoders_key):
+            encoders = read_pickle(key=encoders_key, use_joblib=True)
+            scaler = read_pickle(key=scaler_key, use_joblib=True)
+        elif os.path.exists("artifacts/data/encoders.pkl") and os.path.exists("artifacts/data/scaler.pkl"):
+            logger.info("📁 Falling back to local preprocessing artifacts...")
+            import pickle
+            with open("artifacts/data/encoders.pkl", "rb") as f:
+                encoders = pickle.load(f)
+            with open("artifacts/data/scaler.pkl", "rb") as f:
+                scaler = pickle.load(f)
+        else:
+            # Check if any valid timestamp exists in S3
+            data_keys = list_keys("artifacts/data/")
+            ts_list = [k.split("/")[-2] for k in data_keys if "/X_test.csv" in k or "/encoders.pkl" in k]
+            if ts_list:
+                data_timestamp = sorted(ts_list)[-1]
+                encoders = read_pickle(key=f"artifacts/data/{data_timestamp}/encoders.pkl", use_joblib=True)
+                scaler = read_pickle(key=f"artifacts/data/{data_timestamp}/scaler.pkl", use_joblib=True)
+            else:
+                raise FileNotFoundError(f"Neither S3 artifact {encoders_key} nor local artifact found")
         
         logger.info(f"✅ Loaded preprocessing artifacts:")
         logger.info(f"  • Encoders: {len(encoders)} categorical encoders")
@@ -443,8 +462,17 @@ def run_pandas_inference(model_timestamp=None):
         X_test_key = f"artifacts/data/{data_timestamp}/X_test.csv"
         y_test_key = f"artifacts/data/{data_timestamp}/y_test.csv"
         
-        X_test = read_df_csv(key=X_test_key)
-        y_test = read_df_csv(key=y_test_key).iloc[:, 0]  # Extract series
+        if key_exists(X_test_key):
+            X_test = read_df_csv(key=X_test_key)
+            y_test = read_df_csv(key=y_test_key).iloc[:, 0]  # Extract series
+        elif os.path.exists("artifacts/data/X_test.pkl") and os.path.exists("artifacts/data/y_test.pkl"):
+            logger.info("📁 Falling back to local test data...")
+            X_test = pd.read_pickle("artifacts/data/X_test.pkl")
+            y_test_loaded = pd.read_pickle("artifacts/data/y_test.pkl")
+            y_test = y_test_loaded.iloc[:, 0] if isinstance(y_test_loaded, pd.DataFrame) else y_test_loaded
+        else:
+            X_test = read_df_csv(key=X_test_key)
+            y_test = read_df_csv(key=y_test_key).iloc[:, 0]
         
         logger.info(f"✅ Loaded test data:")
         logger.info(f"  • X_test: {X_test.shape[0]:,} rows × {X_test.shape[1]} features")

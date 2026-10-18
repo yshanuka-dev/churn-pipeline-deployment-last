@@ -34,6 +34,9 @@ env/
 .venv/
 .ENV/
 .env/
+.env
+.env.*
+!.env.example
 env.bak/
 venv.bak/
 pyvenv.cfg

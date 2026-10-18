@@ -1,6 +1,6 @@
 FROM python:3.10-slim
 
-LABEL maintainer="Zuu Crew <hi@zuucrew.ai>"
+LABEL maintainer="Yohan Shanuka"
 LABEL description="Kafka Producer Service for Customer Events"
 
 WORKDIR /app
