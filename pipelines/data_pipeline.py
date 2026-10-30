@@ -889,7 +889,9 @@ def _run_pandas_pipeline(data_path, target_column, test_size, force_rebuild, out
 
                 # 5. Log S3 manifest path for easy discovery
                 try:
-                    from utils.config import get_s3_bucket
+                    # get_s3_bucket is imported at module level - do not re-import locally
+                    # (a local rom ... import makes Python treat it as local throughout
+                    # the entire function, causing UnboundLocalError at earlier call sites)
                     s3_bucket = get_s3_bucket()
                     manifest_info = {
                         's3_manifest_key': f"artifacts/data/{pipeline_timestamp}/manifest.json",

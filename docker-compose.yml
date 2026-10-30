@@ -20,12 +20,17 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_SHARED_CREDENTIALS_FILE=/aws/credentials
       - AWS_CONFIG_FILE=/aws/config
-      # LOCAL: SQLite Backend Store (file-based, no external DB needed)
+      # SQLite Backend Store -- run metadata, metrics, params (file in Docker volume)
       - MLFLOW_BACKEND_STORE_URI=sqlite:///mlflow/mlflow.db
-      # LOCAL: S3 for artifacts (still uses AWS S3)
-      - MLFLOW_DEFAULT_ARTIFACT_ROOT=s3://${S3_BUCKET}/artifacts/mlflow-artifacts
+      # S3 artifact root -- models, plots, and binaries stored in S3
+      - MLFLOW_DEFAULT_ARTIFACT_ROOT=s3://${S3_BUCKET}/mlflow-artifacts
+      # Allow requests from Docker service hostnames (prevents DNS rebinding false-positive)
+      - MLFLOW_UVICORN_OPTS=--forwarded-allow-ips=*
     volumes:
       - ~/.aws:/aws:ro
+      - ./src:/opt/app/src:ro
+      - ./utils:/opt/app/utils:ro
+      - ./pipelines:/opt/app/pipelines:ro
       - mlflow-db:/mlflow
     networks:
       - ml-net
@@ -69,6 +74,9 @@ services:
       - SKIP_S3_UPLOAD=false
     volumes:
       - ~/.aws:/aws:ro
+      - ./src:/opt/app/src:ro
+      - ./utils:/opt/app/utils:ro
+      - ./pipelines:/opt/app/pipelines:ro
     networks:
       - ml-net
     depends_on:
@@ -108,6 +116,9 @@ services:
       - SKIP_S3_UPLOAD=false
     volumes:
       - ~/.aws:/aws:ro
+      - ./src:/opt/app/src:ro
+      - ./utils:/opt/app/utils:ro
+      - ./pipelines:/opt/app/pipelines:ro
     networks:
       - ml-net
     depends_on:
@@ -145,6 +156,9 @@ services:
       - PYTHONDONTWRITEBYTECODE=1
     volumes:
       - ~/.aws:/aws:ro
+      - ./src:/opt/app/src:ro
+      - ./utils:/opt/app/utils:ro
+      - ./pipelines:/opt/app/pipelines:ro
     networks:
       - ml-net
     depends_on:

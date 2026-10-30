@@ -318,22 +318,26 @@ def run_pandas_inference(model_timestamp=None):
             
             logger.info("🏆 Attempting to load best model from MLflow...")
             
-            # Quick health check first (1 second timeout)
+            from utils.config import get_mlflow_config
+            mlflow_cfg = get_mlflow_config()
+            tracking_uri = mlflow_cfg.get('tracking_uri', 'http://localhost:5001').rstrip('/')
+            
+            # Quick health check using configured MLflow tracking URI
             try:
-                response = requests.get("http://localhost:5001/health", timeout=1)
+                response = requests.get(f"{tracking_uri}/health", timeout=2)
                 if response.status_code != 200:
                     raise ConnectionError("MLflow server not healthy")
-                logger.info("✅ MLflow server is running")
+                logger.info(f"✅ MLflow server is running at {tracking_uri}")
             except Exception as health_error:
-                logger.warning(f"⚠️ MLflow server not available: {str(health_error)}")
+                logger.warning(f"⚠️ MLflow server not available at {tracking_uri}: {str(health_error)}")
                 raise ConnectionError("MLflow server not reachable")
             
-            client = MlflowClient()
+            mlflow.set_tracking_uri(tracking_uri)
+            client = MlflowClient(tracking_uri=tracking_uri)
             
             # Get latest versions of registered model (with timeout handling)
             try:
-                # Set a shorter timeout for MLflow operations
-                import os
+                # Set a shorter timeout for MLflow operations (os is already imported at module level)
                 os.environ['MLFLOW_HTTP_REQUEST_TIMEOUT'] = '5'  # 5 second timeout
                 
                 latest_versions = client.get_latest_versions(
@@ -414,21 +418,34 @@ def run_pandas_inference(model_timestamp=None):
         
         # Load model metadata to find linked data artifacts (unified structure)
         metadata_key = f"artifacts/train/{model_timestamp}/model_metadata.json"
+        data_timestamp = None
         try:
             from utils.s3_io import get_bytes
             metadata_json = get_bytes(metadata_key).decode('utf-8')
             metadata = json.loads(metadata_json)
-            data_timestamp = metadata.get('data_artifacts_timestamp', model_timestamp)
-            logger.info(f"✅ Found linked data artifacts: {data_timestamp}")
-        except:
-            logger.warning(f"⚠️ Could not load model metadata, using model timestamp")
-            data_timestamp = model_timestamp
-        
-        # Load encoders and scaler (unified structure with local fallback)
+            cand_ts = metadata.get('data_artifacts_timestamp')
+            # Check if linked timestamp is valid numeric timestamp
+            if cand_ts and str(cand_ts).isdigit():
+                data_timestamp = str(cand_ts)
+                logger.info(f"✅ Found linked data artifacts: {data_timestamp}")
+        except Exception:
+            pass
+
+        # Load encoders and scaler (unified structure with S3 timestamp discovery and local fallback)
+        from utils.s3_io import key_exists
+        if not data_timestamp or not key_exists(f"artifacts/data/{data_timestamp}/encoders.pkl"):
+            logger.info("🔍 Resolving latest data artifacts timestamp from S3...")
+            data_keys = list_keys("artifacts/data/")
+            ts_list = [k.split("/")[-2] for k in data_keys if ("/X_test.csv" in k or "/encoders.pkl" in k) and k.split("/")[-2].isdigit()]
+            if ts_list:
+                data_timestamp = sorted(ts_list)[-1]
+                logger.info(f"✅ Using latest S3 data artifacts timestamp: {data_timestamp}")
+            else:
+                data_timestamp = model_timestamp
+
         encoders_key = f"artifacts/data/{data_timestamp}/encoders.pkl"
         scaler_key = f"artifacts/data/{data_timestamp}/scaler.pkl"
         
-        from utils.s3_io import key_exists
         if key_exists(encoders_key):
             encoders = read_pickle(key=encoders_key, use_joblib=True)
             scaler = read_pickle(key=scaler_key, use_joblib=True)
@@ -440,15 +457,7 @@ def run_pandas_inference(model_timestamp=None):
             with open("artifacts/data/scaler.pkl", "rb") as f:
                 scaler = pickle.load(f)
         else:
-            # Check if any valid timestamp exists in S3
-            data_keys = list_keys("artifacts/data/")
-            ts_list = [k.split("/")[-2] for k in data_keys if "/X_test.csv" in k or "/encoders.pkl" in k]
-            if ts_list:
-                data_timestamp = sorted(ts_list)[-1]
-                encoders = read_pickle(key=f"artifacts/data/{data_timestamp}/encoders.pkl", use_joblib=True)
-                scaler = read_pickle(key=f"artifacts/data/{data_timestamp}/scaler.pkl", use_joblib=True)
-            else:
-                raise FileNotFoundError(f"Neither S3 artifact {encoders_key} nor local artifact found")
+            raise FileNotFoundError(f"Neither S3 artifact {encoders_key} nor local artifact found")
         
         logger.info(f"✅ Loaded preprocessing artifacts:")
         logger.info(f"  • Encoders: {len(encoders)} categorical encoders")

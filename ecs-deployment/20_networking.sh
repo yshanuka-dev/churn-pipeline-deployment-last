@@ -42,10 +42,10 @@ unset AWS_PROFILE 2>/dev/null || true
 # Load environment variables (VPC_ID, AWS_REGION, PROJECT name, etc.)
 source "$(dirname "$0")/00_env.sh"
 
-echo "🔒 Step 2: Networking Configuration"
+echo "ðŸ”’ Step 2: Networking Configuration"
 echo "===================================="
 echo ""
-echo "📚 WHAT WE'RE DOING:"
+echo "ðŸ“š WHAT WE'RE DOING:"
 echo "   1. Creating Security Groups (firewalls)"
 echo "   2. Configuring network rules"
 echo "   3. Setting up CloudWatch Logs"
@@ -59,7 +59,7 @@ echo ""
 # HOW: Use AWS EC2 API (security groups are VPC resources, not EC2-specific!)
 echo "Creating security groups..."
 echo ""
-echo "💡 STUDENT NOTE:"
+echo "ðŸ’¡ STUDENT NOTE:"
 echo "   Security Group = Virtual firewall with inbound/outbound rules"
 echo "   Even though we use 'aws ec2' commands, these work for ECS Fargate too!"
 echo ""
@@ -114,9 +114,9 @@ if [ "$SG_ECS_ID" = "None" ]; then
         --region "$AWS_REGION" \
         --no-cli-pager
     
-    echo -e "${GREEN}✅ Created ECS security group: $SG_ECS_ID${NC}"
+    echo -e "${GREEN}âœ… Created ECS security group: $SG_ECS_ID${NC}"
 else
-    echo -e "${GREEN}✅ ECS security group exists: $SG_ECS_ID${NC}"
+    echo -e "${GREEN}âœ… ECS security group exists: $SG_ECS_ID${NC}"
 fi
 echo ""
 
@@ -168,12 +168,12 @@ if [ "$SG_ALB_ID" = "None" ]; then
         --cidr 0.0.0.0/0 \
         --region "$AWS_REGION" 2>/dev/null || true
     
-    echo -e "${GREEN}✅ Created ALB security group: $SG_ALB_ID${NC}"
-    echo -e "${YELLOW}⚠️  NOTE: ALB allows port 80 from anywhere (0.0.0.0/0)${NC}"
+    echo -e "${GREEN}âœ… Created ALB security group: $SG_ALB_ID${NC}"
+    echo -e "${YELLOW}âš ï¸  NOTE: ALB allows port 80 from anywhere (0.0.0.0/0)${NC}"
     echo "   This is OK for development/learning."
     echo "   In production, use HTTPS (port 443) with SSL certificate!"
 else
-    echo -e "${GREEN}✅ ALB security group exists: $SG_ALB_ID${NC}"
+    echo -e "${GREEN}âœ… ALB security group exists: $SG_ALB_ID${NC}"
 fi
 echo ""
 
@@ -185,7 +185,7 @@ echo ""
 # HOW: Create a CloudWatch Logs group where ECS will send container logs
 echo "Creating CloudWatch Logs group..."
 echo ""
-echo "💡 STUDENT NOTE:"
+echo "ðŸ’¡ STUDENT NOTE:"
 echo "   CloudWatch Logs = Centralized logging service"
 echo "   All container stdout/stderr will be sent here"
 echo "   You can view logs in AWS Console or via AWS CLI"
@@ -196,7 +196,7 @@ if aws logs describe-log-groups \
     --region "$AWS_REGION" \
     --query 'logGroups[0].logGroupName' \
     --output text | grep -q "$LOG_GROUP"; then
-    echo -e "${GREEN}✅ Log group exists: $LOG_GROUP${NC}"
+    echo -e "${GREEN}âœ… Log group exists: $LOG_GROUP${NC}"
 else
     aws logs create-log-group \
         --log-group-name "$LOG_GROUP" \
@@ -208,14 +208,14 @@ else
         --retention-in-days 7 \
         --region "$AWS_REGION"
     
-    echo -e "${GREEN}✅ Created log group: $LOG_GROUP${NC}"
+    echo -e "${GREEN}âœ… Created log group: $LOG_GROUP${NC}"
 fi
 echo ""
 
 # ============================================
 # Step 3: Update .env.out
 # ============================================
-echo "💾 Saving outputs..."
+echo "ðŸ’¾ Saving outputs..."
 
 cat >> "$(dirname "$0")/.env.out" << EOF
 
@@ -225,7 +225,7 @@ export SG_ALB_ID="${SG_ALB_ID}"
 export LOG_GROUP="${LOG_GROUP}"
 EOF
 
-echo -e "${GREEN}✅ Saved to .env.out${NC}"
+echo -e "${GREEN}âœ… Saved to .env.out${NC}"
 echo ""
 
 # ============================================
@@ -233,14 +233,14 @@ echo ""
 # ============================================
 echo ""
 echo "=========================================="
-echo "🎉 Networking Setup Complete!"
+echo "ðŸŽ‰ Networking Setup Complete!"
 echo "=========================================="
 echo ""
 echo "Security Groups:"
-echo "  ✅ ECS Tasks: $SG_ECS_ID"
-echo "  ✅ ALB:       $SG_ALB_ID"
+echo "  âœ… ECS Tasks: $SG_ECS_ID"
+echo "  âœ… ALB:       $SG_ALB_ID"
 echo ""
 echo "CloudWatch Logs:"
-echo "  ✅ Log Group: $LOG_GROUP"
+echo "  âœ… Log Group: $LOG_GROUP"
 echo ""
-echo -e "${YELLOW}📝 Next step: ./30_iam.sh${NC}"
+echo -e "${YELLOW}ðŸ“ Next step: ./30_iam.sh${NC}"

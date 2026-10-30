@@ -49,15 +49,15 @@ if [ -f ".env.out" ]; then
     source ".env.out"
 fi
 
-echo "🚢 Step 6: Create ECS Services"
+echo "ðŸš¢ Step 6: Create ECS Services"
 echo "==============================="
 echo ""
-echo "📚 WHAT WE'RE DOING:"
+echo "ðŸ“š WHAT WE'RE DOING:"
 echo "   1. Creating long-running ECS services"
 echo "   2. Configuring service discovery (internal DNS)"
 echo "   3. Attaching to load balancer"
 echo ""
-echo "💡 STUDENT NOTE:"
+echo "ðŸ’¡ STUDENT NOTE:"
 echo "   ECS Service = Ensures containers stay running"
 echo "   Desired Count = How many copies to run (1 for most services)"
 echo "   Service Discovery = Internal DNS (e.g., mlflow.local)"
@@ -88,11 +88,11 @@ create_service() {
         --output text 2>/dev/null || echo "MISSING")
     
     if [ "$service_status" = "ACTIVE" ]; then
-        echo -e "${GREEN}✅ Service is ACTIVE: $service_name${NC}"
+        echo -e "${GREEN}âœ… Service is ACTIVE: $service_name${NC}"
         echo ""
         return 0
     elif [ "$service_status" = "INACTIVE" ]; then
-        echo -e "${YELLOW}⚠️  Service is INACTIVE: $service_name${NC}"
+        echo -e "${YELLOW}âš ï¸  Service is INACTIVE: $service_name${NC}"
         echo "   AWS hasn't fully purged it yet - deleting and waiting..."
         
         # Force delete the INACTIVE service
@@ -115,12 +115,12 @@ create_service() {
             --output text 2>/dev/null || echo "MISSING")
         
         if [ "$service_status" = "INACTIVE" ]; then
-            echo -e "${RED}   ❌ Service still INACTIVE after deletion attempt${NC}"
+            echo -e "${RED}   âŒ Service still INACTIVE after deletion attempt${NC}"
             echo "   AWS needs more time. Wait 5 minutes and run: ./update_services.sh"
             echo ""
             return 1
         else
-            echo -e "${GREEN}   ✅ Service ready for creation${NC}"
+            echo -e "${GREEN}   âœ… Service ready for creation${NC}"
         fi
     fi
     
@@ -158,7 +158,7 @@ create_service() {
             --no-cli-pager > /dev/null
     fi
     
-    echo -e "${GREEN}✅ Created service: $service_name${NC}"
+    echo -e "${GREEN}âœ… Created service: $service_name${NC}"
     echo ""
 }
 
@@ -196,7 +196,7 @@ create_service \
     5001
 
 echo ""
-echo "⏳ Waiting for services to stabilize (this may take 2-3 minutes)..."
+echo "â³ Waiting for services to stabilize (this may take 2-3 minutes)..."
 aws ecs wait services-stable \
     --cluster "$CLUSTER_NAME" \
     --services airflow-webserver-svc airflow-scheduler-svc airflow-worker-svc mlflow-tracking-svc \
@@ -204,13 +204,13 @@ aws ecs wait services-stable \
 
 echo ""
 echo "=========================================="
-echo "🎉 Services Created Successfully!"
+echo "ðŸŽ‰ Services Created Successfully!"
 echo "=========================================="
 echo ""
-echo "✅ All services are running"
+echo "âœ… All services are running"
 echo ""
 echo "Access URLs:"
-echo "  🌐 Airflow UI: http://${ALB_DNS}"
-echo "  🌐 MLflow UI:  http://${ALB_DNS}:5001"
+echo "  ðŸŒ Airflow UI: http://${ALB_DNS}"
+echo "  ðŸŒ MLflow UI:  http://${ALB_DNS}:5001"
 echo ""
 

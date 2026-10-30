@@ -2,6 +2,8 @@ import os
 import yaml
 import logging
 import re
+import socket
+from urllib.parse import urlparse
 from typing import Dict, Any, List, Optional
 from dotenv import load_dotenv
 
@@ -249,10 +251,23 @@ def get_aws_config() -> Dict[str, Any]:
     else:
         force_s3 = aws_config.get('force_s3_io', aws_config.get('use_s3', True))
 
+    raw_region = aws_config.get('region') or os.getenv('AWS_REGION') or os.getenv('AWS_DEFAULT_REGION') or 'ap-south-1'
+    if str(raw_region).startswith('${') or not raw_region:
+        raw_region = os.getenv('AWS_REGION') or os.getenv('AWS_DEFAULT_REGION') or 'ap-south-1'
+    region_val = str(raw_region).strip()
+
+    raw_bucket = aws_config.get('s3_bucket') or os.getenv('S3_BUCKET') or ''
+    if str(raw_bucket).startswith('${'):
+        raw_bucket = os.getenv('S3_BUCKET') or ''
+    bucket_val = str(raw_bucket).strip()
+    kms_val = aws_config.get('s3_kms_key_arn') or os.getenv('S3_KMS_KEY_ARN')
+    if kms_val:
+        kms_val = str(kms_val).strip()
+
     return {
-        'region': aws_config.get('region', os.getenv('AWS_REGION', 'ap-south-1')),
-        'bucket': aws_config.get('s3_bucket', os.getenv('S3_BUCKET')),
-        'kms_key_arn': aws_config.get('s3_kms_key_arn', os.getenv('S3_KMS_KEY_ARN')),
+        'region': region_val,
+        'bucket': bucket_val,
+        'kms_key_arn': kms_val,
         'force_s3_io': force_s3
     }
 
@@ -314,12 +329,40 @@ def force_s3_io() -> bool:
     return use_s3()
 
 
+def _resolve_mlflow_tracking_uri(tracking_uri: Optional[str]) -> Optional[str]:
+    """Resolve Docker service aliases to an IP-based URL to avoid Host-header rejections."""
+    if not tracking_uri:
+        return tracking_uri
+
+    try:
+        parsed = urlparse(tracking_uri)
+    except ValueError:
+        return tracking_uri
+
+    if parsed.hostname != 'mlflow-tracking':
+        return tracking_uri
+
+    try:
+        resolved_ip = socket.gethostbyname(parsed.hostname)
+    except socket.gaierror:
+        return tracking_uri
+
+    if not resolved_ip or resolved_ip in {'127.0.0.1', '0.0.0.0'}:
+        return tracking_uri
+
+    netloc = resolved_ip if parsed.port is None else f'{resolved_ip}:{parsed.port}'
+    resolved_uri = parsed._replace(netloc=netloc).geturl()
+    logger.info(f"Resolved MLflow Docker service alias '{parsed.hostname}' to '{resolved_uri}' for Host-header compatibility")
+    return resolved_uri
+
+
 def get_mlflow_config() -> Dict[str, Any]:
     """Get MLflow configuration with sensible defaults and S3 artifact root."""
     config = load_config()
     mlflow_config = config.get('mlflow', {})
     
     tracking_uri = os.getenv('MLFLOW_TRACKING_URI') or mlflow_config.get('tracking_uri', 'http://localhost:5001')
+    tracking_uri = _resolve_mlflow_tracking_uri(tracking_uri)
     artifact_root = os.getenv('MLFLOW_DEFAULT_ARTIFACT_ROOT') or mlflow_config.get('artifact_root')
     experiment_name = mlflow_config.get('experiment_name', 'Churn Analysis')
     
@@ -372,7 +415,7 @@ def get_mlflow_tracking_uri():
     env_tracking_uri = os.environ.get('MLFLOW_TRACKING_URI')
     if env_tracking_uri:
         environment = 'ECS' if os.environ.get('CONTAINERIZED', 'false').lower() == 'true' else 'Local'
-        return env_tracking_uri, environment
+        return _resolve_mlflow_tracking_uri(env_tracking_uri), environment
     
     # PRIORITY 2: Fall back to config file
     config = load_config()
@@ -388,7 +431,7 @@ def get_mlflow_tracking_uri():
         tracking_uri = mlflow_config.get('local_tracking_uri', 'http://localhost:5001')
         environment = 'Local'
     
-    return tracking_uri, environment
+    return _resolve_mlflow_tracking_uri(tracking_uri), environment
 
 def is_containerized():
     """Check if running in containerized environment"""

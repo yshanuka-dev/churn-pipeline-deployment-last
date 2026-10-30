@@ -29,7 +29,7 @@
 # The ALB is like a smart receptionist that directs visitors (HTTP requests)
 # to the right office (container). Target Groups are like department labels.
 #
-# Example: Request to /airflow → ALB → Airflow Target Group → Airflow Container
+# Example: Request to /airflow â†’ ALB â†’ Airflow Target Group â†’ Airflow Container
 ################################################################################
 
 set -euo pipefail  # Exit on error, undefined variables, or pipe failures
@@ -44,10 +44,10 @@ unset AWS_PROFILE 2>/dev/null || true
 source "$(dirname "$0")/00_env.sh"
 [[ -f "$(dirname "$0")/.env.out" ]] && source "$(dirname "$0")/.env.out"
 
-echo "🚀 Step 4: ECS Cluster + ALB Setup"
+echo "ðŸš€ Step 4: ECS Cluster + ALB Setup"
 echo "===================================="
 echo ""
-echo "📚 WHAT WE'RE DOING:"
+echo "ðŸ“š WHAT WE'RE DOING:"
 echo "   1. Creating ECS Fargate Cluster"
 echo "   2. Creating Application Load Balancer (ALB)"
 echo "   3. Creating Target Groups for routing"
@@ -62,7 +62,7 @@ echo ""
 # HOW: Use ECS API to create cluster with Fargate capacity provider
 echo "Creating ECS cluster..."
 echo ""
-echo "💡 STUDENT NOTE:"
+echo "ðŸ’¡ STUDENT NOTE:"
 echo "   ECS Cluster = Platform where all containers run"
 echo "   Fargate = Serverless (no EC2 instances to manage!)"
 echo "   AWS handles all infrastructure automatically"
@@ -73,14 +73,14 @@ if aws ecs describe-clusters \
     --region "$AWS_REGION" \
     --query 'clusters[0].clusterName' \
     --output text | grep -q "$CLUSTER_NAME"; then
-    echo -e "${GREEN}✅ ECS cluster exists: $CLUSTER_NAME${NC}"
+    echo -e "${GREEN}âœ… ECS cluster exists: $CLUSTER_NAME${NC}"
 else
     aws ecs create-cluster \
         --cluster-name "$CLUSTER_NAME" \
         --region "$AWS_REGION" \
         --no-cli-pager
     
-    echo -e "${GREEN}✅ Created ECS cluster: $CLUSTER_NAME${NC}"
+    echo -e "${GREEN}âœ… Created ECS cluster: $CLUSTER_NAME${NC}"
 fi
 echo ""
 
@@ -99,7 +99,7 @@ ALB_ARN=$(aws elbv2 describe-load-balancers \
     --output text 2>/dev/null || echo "None")
 
 if [ "$ALB_ARN" != "None" ]; then
-    echo -e "${GREEN}✅ ALB exists: $ALB_NAME${NC}"
+    echo -e "${GREEN}âœ… ALB exists: $ALB_NAME${NC}"
     
     ALB_DNS=$(aws elbv2 describe-load-balancers \
         --load-balancer-arns "$ALB_ARN" \
@@ -129,7 +129,7 @@ else
         --query 'LoadBalancers[0].DNSName' \
         --output text)
     
-    echo -e "${GREEN}✅ Created ALB: $ALB_NAME${NC}"
+    echo -e "${GREEN}âœ… Created ALB: $ALB_NAME${NC}"
     echo "   DNS: $ALB_DNS"
 fi
 echo ""
@@ -149,7 +149,7 @@ TG_ARN=$(aws elbv2 describe-target-groups \
     --output text 2>/dev/null || echo "None")
 
 if [ "$TG_ARN" != "None" ]; then
-    echo -e "${GREEN}✅ Target group exists: $TG_NAME${NC}"
+    echo -e "${GREEN}âœ… Target group exists: $TG_NAME${NC}"
 else
     # Create target group
     TG_ARN=$(aws elbv2 create-target-group \
@@ -169,7 +169,7 @@ else
         --query 'TargetGroups[0].TargetGroupArn' \
         --output text)
     
-    echo -e "${GREEN}✅ Created target group: $TG_NAME${NC}"
+    echo -e "${GREEN}âœ… Created target group: $TG_NAME${NC}"
 fi
 echo ""
 
@@ -186,7 +186,7 @@ LISTENER_ARN=$(aws elbv2 describe-listeners \
     --output text 2>/dev/null || echo "None")
 
 if [ "$LISTENER_ARN" != "None" ]; then
-    echo -e "${GREEN}✅ Listener exists${NC}"
+    echo -e "${GREEN}âœ… Listener exists${NC}"
 else
     # Create listener
     LISTENER_ARN=$(aws elbv2 create-listener \
@@ -198,7 +198,7 @@ else
         --query 'Listeners[0].ListenerArn' \
         --output text)
     
-    echo -e "${GREEN}✅ Created listener on port 80${NC}"
+    echo -e "${GREEN}âœ… Created listener on port 80${NC}"
 fi
 echo ""
 
@@ -217,7 +217,7 @@ MLFLOW_TG_ARN=$(aws elbv2 describe-target-groups \
     --output text 2>/dev/null || echo "None")
 
 if [ "$MLFLOW_TG_ARN" != "None" ]; then
-    echo -e "${GREEN}✅ MLflow target group exists: $MLFLOW_TG_NAME${NC}"
+    echo -e "${GREEN}âœ… MLflow target group exists: $MLFLOW_TG_NAME${NC}"
 else
     # Create target group
     MLFLOW_TG_ARN=$(aws elbv2 create-target-group \
@@ -237,14 +237,14 @@ else
         --query 'TargetGroups[0].TargetGroupArn' \
         --output text)
     
-    echo -e "${GREEN}✅ Created MLflow target group: $MLFLOW_TG_NAME${NC}"
+    echo -e "${GREEN}âœ… Created MLflow target group: $MLFLOW_TG_NAME${NC}"
 fi
 echo ""
 
 # ============================================
 # Step 6: Update .env.out
 # ============================================
-echo "💾 Saving outputs..."
+echo "ðŸ’¾ Saving outputs..."
 
 cat >> "$(dirname "$0")/.env.out" << EOF
 
@@ -257,7 +257,7 @@ export MLFLOW_TG_ARN="${MLFLOW_TG_ARN}"
 export LISTENER_ARN="${LISTENER_ARN}"
 EOF
 
-echo -e "${GREEN}✅ Saved to .env.out${NC}"
+echo -e "${GREEN}âœ… Saved to .env.out${NC}"
 echo ""
 
 # ============================================
@@ -265,25 +265,25 @@ echo ""
 # ============================================
 echo ""
 echo "=========================================="
-echo "🎉 ECS Cluster + ALB Setup Complete!"
+echo "ðŸŽ‰ ECS Cluster + ALB Setup Complete!"
 echo "=========================================="
 echo ""
 echo "ECS Cluster:"
-echo "  ✅ Name: $CLUSTER_NAME"
+echo "  âœ… Name: $CLUSTER_NAME"
 echo ""
 echo "Application Load Balancer:"
-echo "  ✅ Name: $ALB_NAME"
-echo "  ✅ DNS:  $ALB_DNS"
-echo "  ✅ ARN:  $ALB_ARN"
+echo "  âœ… Name: $ALB_NAME"
+echo "  âœ… DNS:  $ALB_DNS"
+echo "  âœ… ARN:  $ALB_ARN"
 echo ""
 echo "Target Groups:"
-echo "  ✅ Airflow: $TG_NAME"
-echo "  ✅ MLflow:  $MLFLOW_TG_NAME"
+echo "  âœ… Airflow: $TG_NAME"
+echo "  âœ… MLflow:  $MLFLOW_TG_NAME"
 echo ""
 echo "Access URLs (after services are running):"
-echo "  🌐 Airflow UI: http://$ALB_DNS"
-echo "  🌐 MLflow UI:  http://$ALB_DNS:5001"
+echo "  ðŸŒ Airflow UI: http://$ALB_DNS"
+echo "  ðŸŒ MLflow UI:  http://$ALB_DNS:5001"
 echo ""
-echo -e "${YELLOW}⚠️  Note: ALB is publicly accessible. Restrict access in production!${NC}"
+echo -e "${YELLOW}âš ï¸  Note: ALB is publicly accessible. Restrict access in production!${NC}"
 echo ""
-echo -e "${YELLOW}📝 Next step: ./50_register_tasks.sh${NC}"
+echo -e "${YELLOW}ðŸ“ Next step: ./50_register_tasks.sh${NC}"

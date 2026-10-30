@@ -9,27 +9,27 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-echo "🔧 Rebuilding Docker images for linux/amd64 platform"
+echo "ðŸ”§ Rebuilding Docker images for linux/amd64 platform"
 echo "====================================================="
 echo ""
-echo "⚠️  This may take 10-15 minutes on Apple Silicon"
+echo "âš ï¸  This may take 10-15 minutes on Apple Silicon"
 echo "    Docker will use QEMU emulation for AMD64"
 echo ""
 
 # Check if buildx is available (better for cross-platform)
 if docker buildx version &>/dev/null; then
-    echo "✅ Using docker buildx for cross-platform build"
+    echo "âœ… Using docker buildx for cross-platform build"
     BUILDER="buildx"
     
     # Create/use buildx builder
     docker buildx create --name amd64-builder --use 2>/dev/null || docker buildx use amd64-builder
 else
-    echo "ℹ️  Using standard docker build"
+    echo "â„¹ï¸  Using standard docker build"
     BUILDER="standard"
 fi
 
 echo ""
-echo "🏗️  Building images..."
+echo "ðŸ—ï¸  Building images..."
 echo ""
 
 # Image configurations: dockerfile|target|tag
@@ -44,14 +44,14 @@ IMAGES=(
 for img_info in "${IMAGES[@]}"; do
     IFS='|' read -r dockerfile target full_tag <<< "$img_info"
     
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
     echo "Building: $full_tag"
     if [ -n "$target" ]; then
         echo "  Dockerfile: $dockerfile (target: $target)"
     else
         echo "  Dockerfile: $dockerfile"
     fi
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
     
     # Build command with optional target
     if [ "$BUILDER" = "buildx" ]; then
@@ -63,7 +63,7 @@ for img_info in "${IMAGES[@]}"; do
                 --target "$target" \
                 -t "$full_tag" \
                 . || {
-                    echo "❌ Failed to build $full_tag"
+                    echo "âŒ Failed to build $full_tag"
                     exit 1
                 }
         else
@@ -73,7 +73,7 @@ for img_info in "${IMAGES[@]}"; do
                 -f "$dockerfile" \
                 -t "$full_tag" \
                 . || {
-                    echo "❌ Failed to build $full_tag"
+                    echo "âŒ Failed to build $full_tag"
                     exit 1
                 }
         fi
@@ -85,7 +85,7 @@ for img_info in "${IMAGES[@]}"; do
                 --target "$target" \
                 -t "$full_tag" \
                 . || {
-                    echo "❌ Failed to build $full_tag"
+                    echo "âŒ Failed to build $full_tag"
                     exit 1
                 }
         else
@@ -94,21 +94,21 @@ for img_info in "${IMAGES[@]}"; do
                 -f "$dockerfile" \
                 -t "$full_tag" \
                 . || {
-                    echo "❌ Failed to build $full_tag"
+                    echo "âŒ Failed to build $full_tag"
                     exit 1
                 }
         fi
     fi
     
-    echo "✅ Built: $full_tag"
+    echo "âœ… Built: $full_tag"
     echo ""
 done
 
 echo ""
 # Verify platform
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🔍 Verifying image platforms..."
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
+echo "ðŸ” Verifying image platforms..."
+echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
 echo ""
 
 for img_info in "${IMAGES[@]}"; do
@@ -116,20 +116,20 @@ for img_info in "${IMAGES[@]}"; do
     
     platform=$(docker image inspect "$full_tag" --format '{{.Os}}/{{.Architecture}}' 2>/dev/null || echo "not found")
     if [ "$platform" = "linux/amd64" ]; then
-        echo "✅ $full_tag → $platform"
+        echo "âœ… $full_tag â†’ $platform"
     else
-        echo "❌ $full_tag → $platform (expected linux/amd64)"
+        echo "âŒ $full_tag â†’ $platform (expected linux/amd64)"
     fi
 done
 
 echo ""
 echo "=========================================="
-echo "🎉 Rebuild Complete!"
+echo "ðŸŽ‰ Rebuild Complete!"
 echo "=========================================="
 echo ""
 
 # Clean up dangling images (old ARM64 versions)
-echo "🧹 Cleaning up dangling images (old ARM64 versions)..."
+echo "ðŸ§¹ Cleaning up dangling images (old ARM64 versions)..."
 echo ""
 
 # Show what will be removed
@@ -144,14 +144,14 @@ if [ "$DANGLING_COUNT" -gt 0 ]; then
     docker image prune -f
     
     echo ""
-    echo "✅ Cleanup complete! Disk space freed."
+    echo "âœ… Cleanup complete! Disk space freed."
 else
     echo "No dangling images found - nothing to clean up"
 fi
 
 echo ""
 echo "=========================================="
-echo "📝 Next steps:"
+echo "ðŸ“ Next steps:"
 echo "=========================================="
 echo ""
 echo "   1. cd ecs-deploy"

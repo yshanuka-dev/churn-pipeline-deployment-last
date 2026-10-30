@@ -14,10 +14,10 @@ source "${SCRIPT_DIR}/00_env.sh"
 TMPDIR="${SCRIPT_DIR}/.tmp"
 mkdir -p "$TMPDIR"
 
-echo "🔐 Step 3: IAM Roles Configuration"
+echo "ðŸ” Step 3: IAM Roles Configuration"
 echo "==================================="
 echo ""
-echo "📚 WHAT WE'RE DOING:"
+echo "ðŸ“š WHAT WE'RE DOING:"
 echo "   1. Creating Task Execution Role (for ECS platform)"
 echo "   2. Creating Task Role (for your application code)"
 echo "   3. Attaching policies for S3, RDS, CloudWatch access"
@@ -28,7 +28,7 @@ echo ""
 # ============================================
 echo "Creating Task Execution Role..."
 echo ""
-echo "💡 STUDENT NOTE:"
+echo "ðŸ’¡ STUDENT NOTE:"
 echo "   Task Execution Role = Permissions for ECS (not your code)"
 echo "   Allows ECS to: pull Docker images, write CloudWatch logs, read secrets"
 echo ""
@@ -36,7 +36,7 @@ echo ""
 EXEC_ROLE_NAME="${PROJECT}-task-execution-role"
 
 if aws iam get-role --role-name "$EXEC_ROLE_NAME" --region "$AWS_REGION" &>/dev/null; then
-    echo -e "${GREEN}✅ Task execution role exists: $EXEC_ROLE_NAME${NC}"
+    echo -e "${GREEN}âœ… Task execution role exists: $EXEC_ROLE_NAME${NC}"
     EXEC_ROLE_ARN=$(aws iam get-role --role-name "$EXEC_ROLE_NAME" --region "$AWS_REGION" --query 'Role.Arn' --output text)
 else
     # Write trust policy to LOCAL path (not /tmp/)
@@ -94,7 +94,7 @@ EOF
         --policy-document "file://${TMPDIR}/exec-role-policy.json" \
         --region "$AWS_REGION"
 
-    echo -e "${GREEN}✅ Created task execution role: $EXEC_ROLE_ARN${NC}"
+    echo -e "${GREEN}âœ… Created task execution role: $EXEC_ROLE_ARN${NC}"
 fi
 echo ""
 
@@ -106,7 +106,7 @@ echo "Creating Task Role..."
 TASK_ROLE_NAME="${PROJECT}-task-role"
 
 if aws iam get-role --role-name "$TASK_ROLE_NAME" --region "$AWS_REGION" &>/dev/null; then
-    echo -e "${GREEN}✅ Task role exists: $TASK_ROLE_NAME${NC}"
+    echo -e "${GREEN}âœ… Task role exists: $TASK_ROLE_NAME${NC}"
     TASK_ROLE_ARN=$(aws iam get-role --role-name "$TASK_ROLE_NAME" --region "$AWS_REGION" --query 'Role.Arn' --output text)
 else
     TASK_ROLE_ARN=$(aws iam create-role \
@@ -164,14 +164,14 @@ EOF
         --policy-document "file://${TMPDIR}/task-role-policy.json" \
         --region "$AWS_REGION"
 
-    echo -e "${GREEN}✅ Created task role: $TASK_ROLE_ARN${NC}"
+    echo -e "${GREEN}âœ… Created task role: $TASK_ROLE_ARN${NC}"
 fi
 echo ""
 
 # ============================================
 # Step 3: Update .env.out
 # ============================================
-echo "💾 Saving outputs..."
+echo "ðŸ’¾ Saving outputs..."
 
 cat >> "${SCRIPT_DIR}/.env.out" << EOF
 
@@ -182,29 +182,29 @@ export EXEC_ROLE_NAME="${EXEC_ROLE_NAME}"
 export TASK_ROLE_NAME="${TASK_ROLE_NAME}"
 EOF
 
-echo -e "${GREEN}✅ Saved to .env.out${NC}"
+echo -e "${GREEN}âœ… Saved to .env.out${NC}"
 
 # Cleanup
 rm -rf "$TMPDIR"
 
 echo ""
 echo "=========================================="
-echo "🎉 IAM Setup Complete!"
+echo "ðŸŽ‰ IAM Setup Complete!"
 echo "=========================================="
 echo ""
 echo "Task Execution Role:"
-echo "  ✅ Name: $EXEC_ROLE_NAME"
-echo "  ✅ ARN:  $EXEC_ROLE_ARN"
+echo "  âœ… Name: $EXEC_ROLE_NAME"
+echo "  âœ… ARN:  $EXEC_ROLE_ARN"
 echo ""
 echo "Task Role:"
-echo "  ✅ Name: $TASK_ROLE_NAME"
-echo "  ✅ ARN:  $TASK_ROLE_ARN"
+echo "  âœ… Name: $TASK_ROLE_NAME"
+echo "  âœ… ARN:  $TASK_ROLE_ARN"
 echo ""
 echo "Permissions:"
-echo "  ✅ ECR pull"
-  echo "  ✅ CloudWatch Logs"
-  echo "  ✅ Secrets Manager"
-echo "  ✅ S3 access to ${S3_BUCKET}"
-echo "  ✅ ECS RunTask (for Airflow)"
+echo "  âœ… ECR pull"
+  echo "  âœ… CloudWatch Logs"
+  echo "  âœ… Secrets Manager"
+echo "  âœ… S3 access to ${S3_BUCKET}"
+echo "  âœ… ECS RunTask (for Airflow)"
 echo ""
-echo -e "${YELLOW}📝 Next step: ./40_cluster_alb.sh${NC}"
+echo -e "${YELLOW}ðŸ“ Next step: ./40_cluster_alb.sh${NC}"

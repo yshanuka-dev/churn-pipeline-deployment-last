@@ -13,14 +13,14 @@ export AWS_PAGER=""
 source "$(dirname "$0")/00_env.sh"
 [[ -f "$(dirname "$0")/.env.out" ]] && source "$(dirname "$0")/.env.out"
 
-echo "🔧 Step 7: Initialize Airflow (WITH RESET)"
+echo "ðŸ”§ Step 7: Initialize Airflow (WITH RESET)"
 echo "==========================================="
 echo ""
-echo "⚠️  WARNING: This will DELETE ALL DAG run history!"
+echo "âš ï¸  WARNING: This will DELETE ALL DAG run history!"
 echo ""
 read -p "Continue? (yes/no): " confirm
 if [[ "$confirm" != "yes" ]]; then
-    echo "❌ Aborted"
+    echo "âŒ Aborted"
     exit 0
 fi
 echo ""
@@ -28,7 +28,7 @@ echo ""
 # ============================================
 # Reset Database (Clears ALL history)
 # ============================================
-echo "🗑️  Resetting Airflow database..."
+echo "ðŸ—‘ï¸  Resetting Airflow database..."
 
 TASK_ARN=$(aws ecs run-task \
     --cluster "$CLUSTER_NAME" \
@@ -56,9 +56,9 @@ EXIT_CODE=$(aws ecs describe-tasks \
     --output text)
 
 if [[ "$EXIT_CODE" == "0" ]]; then
-    echo -e "${GREEN}✅ Database reset completed${NC}"
+    echo -e "${GREEN}âœ… Database reset completed${NC}"
 else
-    echo -e "${RED}❌ Database reset failed with exit code: $EXIT_CODE${NC}"
+    echo -e "${RED}âŒ Database reset failed with exit code: $EXIT_CODE${NC}"
     echo "Check CloudWatch logs: /ecs/${PROJECT}"
     exit 1
 fi
@@ -95,9 +95,9 @@ EXIT_CODE=$(aws ecs describe-tasks \
     --output text)
 
 if [[ "$EXIT_CODE" == "0" ]]; then
-    echo -e "${GREEN}✅ DB migration completed${NC}"
+    echo -e "${GREEN}âœ… DB migration completed${NC}"
 else
-    echo -e "${RED}❌ DB migration failed with exit code: $EXIT_CODE${NC}"
+    echo -e "${RED}âŒ DB migration failed with exit code: $EXIT_CODE${NC}"
     exit 1
 fi
 echo ""
@@ -133,9 +133,9 @@ EXIT_CODE=$(aws ecs describe-tasks \
     --output text)
 
 if [[ "$EXIT_CODE" == "0" ]]; then
-    echo -e "${GREEN}✅ Admin user created${NC}"
+    echo -e "${GREEN}âœ… Admin user created${NC}"
 else
-    echo -e "${RED}❌ User creation failed with exit code: $EXIT_CODE${NC}"
+    echo -e "${RED}âŒ User creation failed with exit code: $EXIT_CODE${NC}"
     exit 1
 fi
 echo ""
@@ -145,17 +145,17 @@ echo ""
 # ============================================
 echo ""
 echo "=========================================="
-echo "🎉 Airflow Reset & Initialization Complete!"
+echo "ðŸŽ‰ Airflow Reset & Initialization Complete!"
 echo "=========================================="
 echo ""
 echo "All DAG history has been cleared!"
 echo "Airflow database is fresh and ready to use!"
 echo ""
 echo "Access Information:"
-echo "  🌐 URL:      http://$ALB_DNS"
-echo "  👤 Username: $AIRFLOW_ADMIN_USER"
-echo "  🔑 Password: $AIRFLOW_ADMIN_PASSWORD"
+echo "  ðŸŒ URL:      http://$ALB_DNS"
+echo "  ðŸ‘¤ Username: $AIRFLOW_ADMIN_USER"
+echo "  ðŸ”‘ Password: $AIRFLOW_ADMIN_PASSWORD"
 echo ""
-echo -e "${YELLOW}📝 Next step: ./80_airflow_vars.sh${NC}"
+echo -e "${YELLOW}ðŸ“ Next step: ./80_airflow_vars.sh${NC}"
 echo ""
 

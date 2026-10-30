@@ -41,10 +41,10 @@ unset AWS_PROFILE 2>/dev/null || true
 # Load environment variables (ACCOUNT_ID, AWS_REGION, image names, etc.)
 source "$(dirname "$0")/00_env.sh"
 
-echo "🚀 Step 1: Bootstrap ECR Repositories"
+echo "ðŸš€ Step 1: Bootstrap ECR Repositories"
 echo "======================================"
 echo ""
-echo "📚 WHAT WE'RE DOING:"
+echo "ðŸ“š WHAT WE'RE DOING:"
 echo "   1. Creating ECR repositories (private Docker registries)"
 echo "   2. Logging into ECR"
 echo "   3. Tagging local Docker images"
@@ -84,9 +84,9 @@ LOCAL_IMAGES=(
 # WHAT: Create private Docker registries in AWS
 # WHY: ECS needs a place to pull Docker images from
 # HOW: Use AWS CLI to create ECR repositories
-echo "📦 Creating ECR repositories..."
+echo "ðŸ“¦ Creating ECR repositories..."
 echo ""
-echo "💡 STUDENT NOTE:"
+echo "ðŸ’¡ STUDENT NOTE:"
 echo "   ECR = Elastic Container Registry (AWS's private Docker Hub)"
 echo "   Each repository stores one type of Docker image"
 echo ""
@@ -100,7 +100,7 @@ for repo in "${REPOS[@]}"; do
     if aws ecr describe-repositories \
         --repository-names "$repo" \
         --region "$AWS_REGION" &>/dev/null; then
-        echo -e "${GREEN}✅ Repository exists: $repo${NC}"
+        echo -e "${GREEN}âœ… Repository exists: $repo${NC}"
     else
         echo "Creating repository: $repo"
         # Create new ECR repository with:
@@ -112,7 +112,7 @@ for repo in "${REPOS[@]}"; do
             --image-scanning-configuration scanOnPush=true \
             --encryption-configuration encryptionType=AES256 \
             --no-cli-pager
-        echo -e "${GREEN}✅ Created: $repo${NC}"
+        echo -e "${GREEN}âœ… Created: $repo${NC}"
     fi
     echo ""
 done
@@ -121,18 +121,18 @@ done
 # Step 2: Login to ECR
 # ============================================
 echo ""
-echo "🔑 Logging in to ECR..."
+echo "ðŸ”‘ Logging in to ECR..."
 aws ecr get-login-password --region "$AWS_REGION" | \
     docker login --username AWS --password-stdin \
     "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
-echo -e "${GREEN}✅ Logged in to ECR${NC}"
+echo -e "${GREEN}âœ… Logged in to ECR${NC}"
 echo ""
 
 # ============================================
 # Step 3: Tag and Push Images
 # ============================================
-echo "📤 Tagging and pushing images..."
+echo "ðŸ“¤ Tagging and pushing images..."
 echo ""
 
 # Build ECR URIs
@@ -146,12 +146,12 @@ ECR_INFER="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/churn-pipeline/infe
 echo "Processing: $IMG_AIRFLOW_LOCAL -> $ECR_AIRFLOW"
 if docker image inspect "$IMG_AIRFLOW_LOCAL" &>/dev/null; then
     docker tag "$IMG_AIRFLOW_LOCAL" "$ECR_AIRFLOW"
-    echo -e "${GREEN}✅ Tagged: $IMG_AIRFLOW_LOCAL${NC}"
+    echo -e "${GREEN}âœ… Tagged: $IMG_AIRFLOW_LOCAL${NC}"
     echo "Pushing to ECR..."
     docker push "$ECR_AIRFLOW"
-    echo -e "${GREEN}✅ Pushed: $ECR_AIRFLOW${NC}"
+    echo -e "${GREEN}âœ… Pushed: $ECR_AIRFLOW${NC}"
 else
-    echo -e "${RED}❌ Local image not found: $IMG_AIRFLOW_LOCAL${NC}"
+    echo -e "${RED}âŒ Local image not found: $IMG_AIRFLOW_LOCAL${NC}"
     echo "   Build it first with: docker-compose build"
 fi
 echo ""
@@ -159,12 +159,12 @@ echo ""
 echo "Processing: $IMG_MLFLOW_LOCAL -> $ECR_MLFLOW"
 if docker image inspect "$IMG_MLFLOW_LOCAL" &>/dev/null; then
     docker tag "$IMG_MLFLOW_LOCAL" "$ECR_MLFLOW"
-    echo -e "${GREEN}✅ Tagged: $IMG_MLFLOW_LOCAL${NC}"
+    echo -e "${GREEN}âœ… Tagged: $IMG_MLFLOW_LOCAL${NC}"
     echo "Pushing to ECR..."
     docker push "$ECR_MLFLOW"
-    echo -e "${GREEN}✅ Pushed: $ECR_MLFLOW${NC}"
+    echo -e "${GREEN}âœ… Pushed: $ECR_MLFLOW${NC}"
 else
-    echo -e "${RED}❌ Local image not found: $IMG_MLFLOW_LOCAL${NC}"
+    echo -e "${RED}âŒ Local image not found: $IMG_MLFLOW_LOCAL${NC}"
     echo "   Build it first with: docker-compose build"
 fi
 echo ""
@@ -172,12 +172,12 @@ echo ""
 echo "Processing: $IMG_DATA_LOCAL -> $ECR_DATA"
 if docker image inspect "$IMG_DATA_LOCAL" &>/dev/null; then
     docker tag "$IMG_DATA_LOCAL" "$ECR_DATA"
-    echo -e "${GREEN}✅ Tagged: $IMG_DATA_LOCAL${NC}"
+    echo -e "${GREEN}âœ… Tagged: $IMG_DATA_LOCAL${NC}"
     echo "Pushing to ECR..."
     docker push "$ECR_DATA"
-    echo -e "${GREEN}✅ Pushed: $ECR_DATA${NC}"
+    echo -e "${GREEN}âœ… Pushed: $ECR_DATA${NC}"
 else
-    echo -e "${RED}❌ Local image not found: $IMG_DATA_LOCAL${NC}"
+    echo -e "${RED}âŒ Local image not found: $IMG_DATA_LOCAL${NC}"
     echo "   Build it first with: docker-compose build"
 fi
 echo ""
@@ -185,12 +185,12 @@ echo ""
 echo "Processing: $IMG_TRAIN_LOCAL -> $ECR_TRAIN"
 if docker image inspect "$IMG_TRAIN_LOCAL" &>/dev/null; then
     docker tag "$IMG_TRAIN_LOCAL" "$ECR_TRAIN"
-    echo -e "${GREEN}✅ Tagged: $IMG_TRAIN_LOCAL${NC}"
+    echo -e "${GREEN}âœ… Tagged: $IMG_TRAIN_LOCAL${NC}"
     echo "Pushing to ECR..."
     docker push "$ECR_TRAIN"
-    echo -e "${GREEN}✅ Pushed: $ECR_TRAIN${NC}"
+    echo -e "${GREEN}âœ… Pushed: $ECR_TRAIN${NC}"
 else
-    echo -e "${RED}❌ Local image not found: $IMG_TRAIN_LOCAL${NC}"
+    echo -e "${RED}âŒ Local image not found: $IMG_TRAIN_LOCAL${NC}"
     echo "   Build it first with: docker-compose build"
 fi
 echo ""
@@ -198,12 +198,12 @@ echo ""
 echo "Processing: $IMG_INFER_LOCAL -> $ECR_INFER"
 if docker image inspect "$IMG_INFER_LOCAL" &>/dev/null; then
     docker tag "$IMG_INFER_LOCAL" "$ECR_INFER"
-    echo -e "${GREEN}✅ Tagged: $IMG_INFER_LOCAL${NC}"
+    echo -e "${GREEN}âœ… Tagged: $IMG_INFER_LOCAL${NC}"
     echo "Pushing to ECR..."
     docker push "$ECR_INFER"
-    echo -e "${GREEN}✅ Pushed: $ECR_INFER${NC}"
+    echo -e "${GREEN}âœ… Pushed: $ECR_INFER${NC}"
 else
-    echo -e "${RED}❌ Local image not found: $IMG_INFER_LOCAL${NC}"
+    echo -e "${RED}âŒ Local image not found: $IMG_INFER_LOCAL${NC}"
     echo "   Build it first with: docker-compose build"
 fi
 echo ""
@@ -211,7 +211,7 @@ echo ""
 # ============================================
 # Step 4: Save ECR URIs to .env.out
 # ============================================
-echo "💾 Saving ECR URIs to .env.out..."
+echo "ðŸ’¾ Saving ECR URIs to .env.out..."
 
 cat > "$(dirname "$0")/.env.out" << EOF
 # Generated by 10_bootstrap.sh
@@ -225,7 +225,7 @@ export ECR_TRAIN="${ECR_TRAIN}"
 export ECR_INFER="${ECR_INFER}"
 EOF
 
-echo -e "${GREEN}✅ Saved to .env.out${NC}"
+echo -e "${GREEN}âœ… Saved to .env.out${NC}"
 echo ""
 
 # ============================================
@@ -233,20 +233,20 @@ echo ""
 # ============================================
 echo ""
 echo "=========================================="
-echo "🎉 Bootstrap Complete!"
+echo "ðŸŽ‰ Bootstrap Complete!"
 echo "=========================================="
 echo ""
 echo "ECR Repositories Created:"
 for repo in "${REPOS[@]}"; do
-    echo "  ✅ $repo"
+    echo "  âœ… $repo"
 done
 echo ""
 echo "Images Pushed:"
-echo "  ✅ Airflow: $ECR_AIRFLOW"
-echo "  ✅ MLflow:  $ECR_MLFLOW"
-echo "  ✅ Data:    $ECR_DATA"
-echo "  ✅ Train:   $ECR_TRAIN"
-echo "  ✅ Infer:   $ECR_INFER"
+echo "  âœ… Airflow: $ECR_AIRFLOW"
+echo "  âœ… MLflow:  $ECR_MLFLOW"
+echo "  âœ… Data:    $ECR_DATA"
+echo "  âœ… Train:   $ECR_TRAIN"
+echo "  âœ… Infer:   $ECR_INFER"
 echo ""
-echo -e "${YELLOW}📝 Next step: ./20_networking.sh${NC}"
+echo -e "${YELLOW}ðŸ“ Next step: ./20_networking.sh${NC}"
 

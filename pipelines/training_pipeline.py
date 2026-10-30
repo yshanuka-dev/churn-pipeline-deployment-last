@@ -138,7 +138,7 @@ def _train_sklearn_model(data_path, model_params, test_size, random_state, model
             # Load latest processed data from S3 data_artifacts
             logger.info("📥 Loading latest processed data from S3 data_artifacts...")
             
-            from utils.s3_io import list_keys, read_df_csv, read_df_parquet
+            from utils.s3_io import list_keys, read_df_csv, read_df_parquet, key_exists
             
             # Find the most recent data artifacts timestamp (using unified structure)
             logger.info("🔍 Finding latest data artifacts in S3...")
@@ -179,14 +179,13 @@ def _train_sklearn_model(data_path, model_params, test_size, random_state, model
                     data_artifact_base = f"artifacts/data/{latest_timestamp}"
                     
                     try:
-                        # Prefer Parquet if available
+                        # Prefer Parquet if available, otherwise use CSV (check existence first to avoid noisy NoSuchKey errors)
                         def try_parquet_then_csv(name: str):
                             parquet_key = f"{data_artifact_base}/{name}.parquet"
                             csv_key = f"{data_artifact_base}/{name}.csv"
-                            try:
+                            if key_exists(parquet_key):
                                 return read_df_parquet(key=parquet_key)
-                            except Exception:
-                                return read_df_csv(key=csv_key)
+                            return read_df_csv(key=csv_key)
                         
                         X_train = try_parquet_then_csv('X_train')
                         X_test = try_parquet_then_csv('X_test')
@@ -235,21 +234,32 @@ def _train_sklearn_model(data_path, model_params, test_size, random_state, model
             'environment': 'development'
         }
         mlflow_tracker.start_run(run_name=f"Training Pipeline | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", tags=run_tags)
-        
+
+        # Check if MLflow run is active (it may have failed to start gracefully)
+        _mlflow_active = mlflow.active_run() is not None
+
         # Log model parameters
         model_params_final = {
             'n_estimators': model_params.get('n_estimators', 100),
             'max_depth': model_params.get('max_depth', 10),
             'random_state': random_state
         }
-        mlflow.log_params(model_params_final)
-        
+        if _mlflow_active:
+            try:
+                mlflow.log_params(model_params_final)
+            except Exception as _e:
+                logger.warning(f"⚠️ MLflow log_params failed (non-fatal): {_e}")
+
         # Log dataset metrics
-        mlflow.log_metrics({
-            'training_samples': X_train.shape[0],
-            'test_samples': X_test.shape[0],
-            'feature_count': X_train.shape[1]
-        })
+        if _mlflow_active:
+            try:
+                mlflow.log_metrics({
+                    'training_samples': X_train.shape[0],
+                    'test_samples': X_test.shape[0],
+                    'feature_count': X_train.shape[1]
+                })
+            except Exception as _e:
+                logger.warning(f"⚠️ MLflow log_metrics failed (non-fatal): {_e}")
         
         model = RandomForestClassifier(**model_params_final)
         
@@ -274,20 +284,32 @@ def _train_sklearn_model(data_path, model_params, test_size, random_state, model
             'training_time_seconds': training_time
         }
         
-        # Log metrics to MLflow
-        mlflow.log_metrics(metrics)
-        logger.info(f"✅ Metrics logged to MLflow")
-        
-        # Log parameters to MLflow
-        mlflow.log_params({
-            'n_estimators': model.n_estimators,
-            'max_depth': model.max_depth,
-            'random_state': model.random_state,
-            'n_features': X_train.shape[1],
-            'n_train_samples': X_train.shape[0],
-            'n_test_samples': X_test.shape[0]
-        })
-        logger.info(f"✅ Parameters logged to MLflow")
+        # Log metrics to MLflow (guarded)
+        if _mlflow_active:
+            try:
+                mlflow.log_metrics(metrics)
+                logger.info(f"✅ Metrics logged to MLflow")
+            except Exception as _e:
+                logger.warning(f"⚠️ MLflow log_metrics failed (non-fatal): {_e}")
+        else:
+            logger.info(f"⏩ Skipping MLflow metrics logging (no active run)")
+
+        # Log parameters to MLflow (guarded)
+        if _mlflow_active:
+            try:
+                mlflow.log_params({
+                    'n_estimators': model.n_estimators,
+                    'max_depth': model.max_depth,
+                    'random_state': model.random_state,
+                    'n_features': X_train.shape[1],
+                    'n_train_samples': X_train.shape[0],
+                    'n_test_samples': X_test.shape[0]
+                })
+                logger.info(f"✅ Parameters logged to MLflow")
+            except Exception as _e:
+                logger.warning(f"⚠️ MLflow log_params failed (non-fatal): {_e}")
+        else:
+            logger.info(f"⏩ Skipping MLflow params logging (no active run)")
         
         # Log model artifacts to MLflow
         try:

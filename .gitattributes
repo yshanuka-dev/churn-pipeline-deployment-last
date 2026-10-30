@@ -1,0 +1,13 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Force LF line endings for shell scripts (prevents Windows CRLF breaking Linux containers)
+*.sh text eol=lf
+
+# Force LF for other files used inside Linux containers
+Dockerfile* text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.py text eol=lf
+Makefile text eol=lf
+

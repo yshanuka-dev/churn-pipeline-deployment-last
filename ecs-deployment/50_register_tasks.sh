@@ -46,15 +46,15 @@ unset AWS_PROFILE 2>/dev/null || true
 source "$(dirname "$0")/00_env.sh"
 [[ -f "$(dirname "$0")/.env.out" ]] && source "$(dirname "$0")/.env.out"
 
-echo "📋 Step 5: Register Task Definitions"
+echo "ðŸ“‹ Step 5: Register Task Definitions"
 echo "====================================="
 echo ""
-echo "📚 WHAT WE'RE DOING:"
+echo "ðŸ“š WHAT WE'RE DOING:"
 echo "   1. Processing task definition templates"
 echo "   2. Replacing environment variables"
 echo "   3. Registering with ECS"
 echo ""
-echo "💡 STUDENT NOTE:"
+echo "ðŸ’¡ STUDENT NOTE:"
 echo "   Task Definition = Container blueprint (CPU, memory, image, env vars)"
 echo "   Each service (Airflow, MLflow, etc.) has its own task definition"
 echo ""
@@ -80,7 +80,7 @@ register_task() {
     
     # Validate JSON using python instead of jq
     if ! python -m json.tool "$processed" > /dev/null 2>&1; then
-        echo -e "${RED}❌ Invalid JSON in $template${NC}"
+        echo -e "${RED}âŒ Invalid JSON in $template${NC}"
         cat "$processed"
         return 1
     fi
@@ -92,7 +92,7 @@ register_task() {
         --query 'taskDefinition.taskDefinitionArn' \
         --output text)
     
-    echo -e "${GREEN}✅ Registered: $family${NC}"
+    echo -e "${GREEN}âœ… Registered: $family${NC}"
     echo "   ARN: $TASK_ARN"
     echo ""
     
@@ -180,7 +180,7 @@ fi
 # ============================================
 echo ""
 echo "=========================================="
-echo "🎉 Task Registration Complete!"
+echo "ðŸŽ‰ Task Registration Complete!"
 echo "=========================================="
 echo ""
 echo "Registered task definitions:"
@@ -190,4 +190,4 @@ aws ecs list-task-definitions \
     --query 'taskDefinitionArns' \
     --output table
 echo ""
-echo -e "${YELLOW}📝 Next step: ./60_services.sh${NC}"
+echo -e "${YELLOW}ðŸ“ Next step: ./60_services.sh${NC}"

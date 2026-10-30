@@ -35,9 +35,9 @@ ACTION="start"
 
 show_help() {
     cat << EOF
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🚀 LOCAL DEPLOYMENT - Airflow + Kafka
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+ðŸš€ LOCAL DEPLOYMENT - Airflow + Kafka
+â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
 
 Usage: ./run_local.sh [options]
 
@@ -49,14 +49,14 @@ Options:
   -h, --help        Show this help message
 
 What it starts:
-  • Airflow (2 DAGs): data_pipeline_every_20m, train_pipeline_every_60m
-  • Kafka (3 containers): producer, inference, analytics
-  • MLflow: Tracking server
+  â€¢ Airflow (2 DAGs): data_pipeline_every_20m, train_pipeline_every_60m
+  â€¢ Kafka (3 containers): producer, inference, analytics
+  â€¢ MLflow: Tracking server
 
 Access URLs:
-  • Airflow UI:  http://localhost:8080 (admin/admin)
-  • MLflow UI:   http://localhost:5001
-  • Kafka UI:    http://localhost:8090
+  â€¢ Airflow UI:  http://localhost:8080 (admin/admin)
+  â€¢ MLflow UI:   http://localhost:5001
+  â€¢ Kafka UI:    http://localhost:8090
 
 Examples:
   ./run_local.sh                    # Start all services (build if needed)
@@ -65,7 +65,7 @@ Examples:
   ./run_local.sh --status           # Check status
   ./run_local.sh --logs             # View logs
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
 EOF
     exit 0
 }
@@ -101,39 +101,39 @@ done
 
 # Function to show status
 show_status() {
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "📊 SERVICE STATUS"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
+    echo "ðŸ“Š SERVICE STATUS"
+    echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
     echo ""
     
     # MLflow
     if docker ps | grep -q mlflow-tracking; then
-        echo -e "   ${GREEN}✅ MLflow:${NC} Running at http://localhost:5001"
+        echo -e "   ${GREEN}âœ… MLflow:${NC} Running at http://localhost:5001"
     else
-        echo -e "   ${RED}❌ MLflow:${NC} Not running"
+        echo -e "   ${RED}âŒ MLflow:${NC} Not running"
     fi
     
     # Airflow
     AIRFLOW_COUNT=$(docker ps | grep airflow | wc -l | tr -d ' ')
     if [ "$AIRFLOW_COUNT" -gt 0 ]; then
-        echo -e "   ${GREEN}✅ Airflow:${NC} Running ($AIRFLOW_COUNT containers) at http://localhost:8080"
+        echo -e "   ${GREEN}âœ… Airflow:${NC} Running ($AIRFLOW_COUNT containers) at http://localhost:8080"
     else
-        echo -e "   ${RED}❌ Airflow:${NC} Not running"
+        echo -e "   ${RED}âŒ Airflow:${NC} Not running"
     fi
     
     # Kafka
     KAFKA_COUNT=$(docker ps | grep -E "kafka|zookeeper" | wc -l | tr -d ' ')
     if [ "$KAFKA_COUNT" -gt 0 ]; then
-        echo -e "   ${GREEN}✅ Kafka:${NC} Running ($KAFKA_COUNT containers)"
+        echo -e "   ${GREEN}âœ… Kafka:${NC} Running ($KAFKA_COUNT containers)"
         docker ps --format "      - {{.Names}}" | grep -E "kafka|zookeeper" || true
     else
-        echo -e "   ${RED}❌ Kafka:${NC} Not running"
+        echo -e "   ${RED}âŒ Kafka:${NC} Not running"
     fi
     
     echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
     echo ""
-    echo "📋 Quick Commands:"
+    echo "ðŸ“‹ Quick Commands:"
     echo "   View logs:     ./run_local.sh --logs"
     echo "   Stop all:      ./run_local.sh --stop"
     echo "   Restart:       ./run_local.sh"
@@ -142,32 +142,32 @@ show_status() {
 
 # Function to stop services
 stop_services() {
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "🛑 STOPPING ALL SERVICES"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
+    echo "ðŸ›‘ STOPPING ALL SERVICES"
+    echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
     echo ""
     
-    echo "🛑 Stopping Kafka services..."
+    echo "ðŸ›‘ Stopping Kafka services..."
     docker-compose -f docker-compose.kafka.yml down 2>/dev/null || true
     echo ""
     
-    echo "🛑 Stopping Airflow services..."
+    echo "ðŸ›‘ Stopping Airflow services..."
     docker-compose -f docker-compose.airflow.yml down 2>/dev/null || true
     echo ""
     
-    echo "🛑 Stopping MLflow and pipelines..."
+    echo "ðŸ›‘ Stopping MLflow and pipelines..."
     docker-compose -f docker-compose.yml down 2>/dev/null || true
     echo ""
     
-    echo -e "${GREEN}✅ All services stopped${NC}"
+    echo -e "${GREEN}âœ… All services stopped${NC}"
     echo ""
 }
 
 # Function to show logs
 show_logs() {
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "📋 VIEWING LOGS (Ctrl+C to exit)"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
+    echo "ðŸ“‹ VIEWING LOGS (Ctrl+C to exit)"
+    echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
     echo ""
     echo "Choose which logs to view:"
     echo ""
@@ -235,57 +235,57 @@ if [ "$ACTION" = "logs" ]; then
 fi
 
 # Main deployment starts here
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🚀 LOCAL DEPLOYMENT - Airflow + Kafka"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
+echo "ðŸš€ LOCAL DEPLOYMENT - Airflow + Kafka"
+echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
 echo ""
 
 # Check Docker
-echo "🐳 Checking Docker..."
+echo "ðŸ³ Checking Docker..."
 if ! docker info >/dev/null 2>&1; then
-    echo -e "${RED}❌ Docker is not running!${NC}"
+    echo -e "${RED}âŒ Docker is not running!${NC}"
     echo "Please start Docker Desktop and try again."
     exit 1
 fi
-echo -e "${GREEN}✅ Docker is running${NC}"
+echo -e "${GREEN}âœ… Docker is running${NC}"
 echo ""
 
 # Clean up existing containers and ports
-echo "🧹 Cleaning up existing containers..."
+echo "ðŸ§¹ Cleaning up existing containers..."
 # Stop Homebrew Kafka if running
 brew services stop kafka >/dev/null 2>&1 || true
 # Remove Docker containers
 docker ps -a | grep -E "kafka|airflow|mlflow" | awk '{print $1}' | xargs -r docker rm -f >/dev/null 2>&1 || true
 # Kill processes on ports
 lsof -ti:9092,9093,9094,29092,8080,5555,8793 2>/dev/null | xargs kill -9 2>/dev/null || true
-echo -e "${GREEN}✅ Cleanup complete${NC}"
+echo -e "${GREEN}âœ… Cleanup complete${NC}"
 echo ""
 
 # Check AWS credentials
-echo "🔍 Checking AWS credentials..."
+echo "ðŸ” Checking AWS credentials..."
 if ! aws sts get-caller-identity >/dev/null 2>&1; then
-    echo -e "${YELLOW}⚠️  AWS credentials not found${NC}"
+    echo -e "${YELLOW}âš ï¸  AWS credentials not found${NC}"
     echo "   S3 uploads may fail. Configure with: aws configure"
 else
     ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-    echo -e "${GREEN}✅ AWS credentials OK (Account: $ACCOUNT_ID)${NC}"
+    echo -e "${GREEN}âœ… AWS credentials OK (Account: $ACCOUNT_ID)${NC}"
 fi
 echo ""
 
 # Check .env file
 if [ ! -f .env ]; then
-    echo -e "${RED}❌ .env file not found!${NC}"
+    echo -e "${RED}âŒ .env file not found!${NC}"
     echo "   Copy .env.example to .env and configure it"
     exit 1
 fi
-echo -e "${GREEN}✅ .env file found${NC}"
+echo -e "${GREEN}âœ… .env file found${NC}"
 echo ""
 
 # Build images if needed
 if [ "$SKIP_BUILD" = false ]; then
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "📦 CHECKING DOCKER IMAGES"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
+    echo "ðŸ“¦ CHECKING DOCKER IMAGES"
+    echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
     echo ""
     
     # Check pipeline images
@@ -298,21 +298,21 @@ if [ "$SKIP_BUILD" = false ]; then
     done
     
     if [ "$IMAGES_MISSING" = true ]; then
-        echo "📦 Building pipeline images..."
+        echo "ðŸ“¦ Building pipeline images..."
         docker-compose -f docker-compose.yml build
-        echo -e "${GREEN}✅ Pipeline images built${NC}"
+        echo -e "${GREEN}âœ… Pipeline images built${NC}"
     else
-        echo -e "${GREEN}✅ Pipeline images exist${NC}"
+        echo -e "${GREEN}âœ… Pipeline images exist${NC}"
     fi
     echo ""
     
     # Check Airflow image
     if ! docker image inspect churn-pipeline/airflow:2.8.1-amazon >/dev/null 2>&1; then
-        echo "📦 Building Airflow image..."
+        echo "ðŸ“¦ Building Airflow image..."
         docker build -t churn-pipeline/airflow:2.8.1-amazon -f docker/Dockerfile.airflow .
-        echo -e "${GREEN}✅ Airflow image built${NC}"
+        echo -e "${GREEN}âœ… Airflow image built${NC}"
     else
-        echo -e "${GREEN}✅ Airflow image exists${NC}"
+        echo -e "${GREEN}âœ… Airflow image exists${NC}"
     fi
     echo ""
     
@@ -326,35 +326,35 @@ if [ "$SKIP_BUILD" = false ]; then
     done
     
     if [ "$KAFKA_MISSING" = true ]; then
-        echo "📦 Building Kafka images..."
+        echo "ðŸ“¦ Building Kafka images..."
         docker-compose -f docker-compose.kafka.yml build
-        echo -e "${GREEN}✅ Kafka images built${NC}"
+        echo -e "${GREEN}âœ… Kafka images built${NC}"
     else
-        echo -e "${GREEN}✅ Kafka images exist${NC}"
+        echo -e "${GREEN}âœ… Kafka images exist${NC}"
     fi
     echo ""
 else
-    echo -e "${YELLOW}⚠️  Skipping image build (using existing images)${NC}"
+    echo -e "${YELLOW}âš ï¸  Skipping image build (using existing images)${NC}"
     echo ""
 fi
 
 # Start services
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🚀 STARTING SERVICES"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
+echo "ðŸš€ STARTING SERVICES"
+echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
 echo ""
 
 # 1. Start MLflow
-echo "1️⃣ Starting MLflow..."
+echo "1ï¸âƒ£ Starting MLflow..."
 docker-compose -f docker-compose.yml up -d mlflow-tracking
-echo -e "${GREEN}✅ MLflow started${NC}"
+echo -e "${GREEN}âœ… MLflow started${NC}"
 echo ""
 
 # Wait for MLflow
-echo "⏳ Waiting for MLflow to be ready..."
+echo "â³ Waiting for MLflow to be ready..."
 for i in {1..30}; do
     if curl -s http://localhost:5001/health >/dev/null 2>&1; then
-        echo -e "${GREEN}✅ MLflow is ready${NC}"
+        echo -e "${GREEN}âœ… MLflow is ready${NC}"
         break
     fi
     sleep 2
@@ -362,16 +362,16 @@ done
 echo ""
 
 # 2. Start Airflow
-echo "2️⃣ Starting Airflow..."
+echo "2ï¸âƒ£ Starting Airflow..."
 DOCKER_DEFAULT_PLATFORM=linux/amd64 docker-compose -f docker-compose.airflow.yml up -d --no-build
-echo -e "${GREEN}✅ Airflow started${NC}"
+echo -e "${GREEN}âœ… Airflow started${NC}"
 echo ""
 
 # Wait for Airflow
-echo "⏳ Waiting for Airflow to be ready..."
+echo "â³ Waiting for Airflow to be ready..."
 for i in {1..60}; do
     if curl -s http://localhost:8080/health >/dev/null 2>&1; then
-        echo -e "${GREEN}✅ Airflow is ready${NC}"
+        echo -e "${GREEN}âœ… Airflow is ready${NC}"
         break
     fi
     sleep 3
@@ -379,46 +379,46 @@ done
 echo ""
 
 # 3. Start Kafka
-echo "3️⃣ Starting Kafka services..."
+echo "3ï¸âƒ£ Starting Kafka services..."
 docker-compose -f docker-compose.kafka.yml up -d
-echo -e "${GREEN}✅ Kafka services started${NC}"
+echo -e "${GREEN}âœ… Kafka services started${NC}"
 echo ""
 
 # Wait for Kafka
-echo "⏳ Waiting for Kafka to be ready..."
+echo "â³ Waiting for Kafka to be ready..."
 sleep 15
-echo -e "${GREEN}✅ Kafka is ready${NC}"
+echo -e "${GREEN}âœ… Kafka is ready${NC}"
 echo ""
 
 # Final status
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo -e "${GREEN}✅ LOCAL DEPLOYMENT COMPLETE!${NC}"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
+echo -e "${GREEN}âœ… LOCAL DEPLOYMENT COMPLETE!${NC}"
+echo "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”"
 echo ""
-echo "🌐 Access URLs:"
-echo "   • Airflow UI:  http://localhost:8080 (admin/admin)"
-echo "   • MLflow UI:   http://localhost:5001"
-echo "   • Kafka UI:    http://localhost:8090"
+echo "ðŸŒ Access URLs:"
+echo "   â€¢ Airflow UI:  http://localhost:8080 (admin/admin)"
+echo "   â€¢ MLflow UI:   http://localhost:5001"
+echo "   â€¢ Kafka UI:    http://localhost:8090"
 echo ""
-echo "📋 Airflow DAGs (Unified Timestamp):"
-echo "   • data_pipeline_every_20m   → Runs every 20 min"
-echo "   • train_pipeline_every_60m  → Runs every 60 min"
+echo "ðŸ“‹ Airflow DAGs (Unified Timestamp):"
+echo "   â€¢ data_pipeline_every_20m   â†’ Runs every 20 min"
+echo "   â€¢ train_pipeline_every_60m  â†’ Runs every 60 min"
 echo ""
-echo "🔄 Kafka Services:"
-echo "   • Producer:   Streaming customer events"
-echo "   • Consumer:   Real-time inference with churn_model.pkl"
-echo "   • Analytics:  Aggregating to PostgreSQL"
+echo "ðŸ”„ Kafka Services:"
+echo "   â€¢ Producer:   Streaming customer events"
+echo "   â€¢ Consumer:   Real-time inference with churn_model.pkl"
+echo "   â€¢ Analytics:  Aggregating to PostgreSQL"
 echo ""
-echo "💡 Useful commands:"
-echo "   • Check status:  ./run_local.sh --status"
-echo "   • View logs:     ./run_local.sh --logs"
-echo "   • Stop all:      ./run_local.sh --stop"
+echo "ðŸ’¡ Useful commands:"
+echo "   â€¢ Check status:  ./run_local.sh --status"
+echo "   â€¢ View logs:     ./run_local.sh --logs"
+echo "   â€¢ Stop all:      ./run_local.sh --stop"
 echo ""
-echo "📊 View logs individually:"
-echo "   • docker logs airflow-scheduler -f"
-echo "   • docker logs kafka-inference -f"
-echo "   • docker logs kafka-producer -f"
-echo "   • docker logs kafka-analytics -f"
+echo "ðŸ“Š View logs individually:"
+echo "   â€¢ docker logs airflow-scheduler -f"
+echo "   â€¢ docker logs kafka-inference -f"
+echo "   â€¢ docker logs kafka-producer -f"
+echo "   â€¢ docker logs kafka-analytics -f"
 echo ""
-echo -e "${GREEN}🎉 All services are running!${NC}"
+echo -e "${GREEN}ðŸŽ‰ All services are running!${NC}"
 echo ""

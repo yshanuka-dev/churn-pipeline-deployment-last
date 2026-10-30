@@ -98,3 +98,6 @@ test_*
 *.temp
 tmp/
 temp/
+# Airflow logs and temporary files
+airflow/logs/
+airflow/logs/**

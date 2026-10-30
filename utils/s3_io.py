@@ -24,10 +24,16 @@ def get_s3_client():
     import botocore.client
     import botocore.config
     
-    # Get credentials and region
+    # Get credentials and region (strip any trailing whitespace / CR / LF)
     aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
+    if aws_access_key_id:
+        aws_access_key_id = aws_access_key_id.strip()
     aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    if aws_secret_access_key:
+        aws_secret_access_key = aws_secret_access_key.strip()
     region = get_aws_region()
+    if region:
+        region = region.strip()
     
     # If environment variables are not set, try to read from Docker mounted credentials file
     if not aws_access_key_id or not aws_secret_access_key:

@@ -43,14 +43,14 @@ unset AWS_PROFILE 2>/dev/null || true
 source "$(dirname "$0")/00_env.sh"
 [[ -f "$(dirname "$0")/.env.out" ]] && source "$(dirname "$0")/.env.out"
 
-echo "🔧 Step 7: Initialize Airflow"
+echo "ðŸ”§ Step 7: Initialize Airflow"
 echo "=============================="
 echo ""
-echo "📚 WHAT WE'RE DOING:"
+echo "ðŸ“š WHAT WE'RE DOING:"
 echo "   1. Initializing Airflow database schema"
 echo "   2. Creating admin user"
 echo ""
-echo "💡 STUDENT NOTE:"
+echo "ðŸ’¡ STUDENT NOTE:"
 echo "   This is a one-time setup for Airflow"
 echo "   Creates database tables and admin login"
 echo ""
@@ -63,7 +63,7 @@ echo ""
 #
 # RESET_HISTORY=${RESET_DAG_HISTORY:-false}
 # if [[ "$RESET_HISTORY" == "true" ]]; then
-#     echo "🗑️  Clearing DAG history (RESET_DAG_HISTORY=true)..."
+#     echo "ðŸ—‘ï¸  Clearing DAG history (RESET_DAG_HISTORY=true)..."
 #     
 #     TASK_ARN=$(aws ecs run-task \
 #         --cluster "$CLUSTER_NAME" \
@@ -83,7 +83,7 @@ echo ""
 #         --tasks "$TASK_ARN" \
 #         --region "$AWS_REGION"
 #     
-#     echo -e "${GREEN}✅ DAG history cleared${NC}"
+#     echo -e "${GREEN}âœ… DAG history cleared${NC}"
 #     echo ""
 # fi
 
@@ -120,9 +120,9 @@ EXIT_CODE=$(aws ecs describe-tasks \
     --output text)
 
 if [[ "$EXIT_CODE" == "0" ]]; then
-    echo -e "${GREEN}✅ DB migration completed successfully${NC}"
+    echo -e "${GREEN}âœ… DB migration completed successfully${NC}"
 else
-    echo -e "${RED}❌ DB migration failed with exit code: $EXIT_CODE${NC}"
+    echo -e "${RED}âŒ DB migration failed with exit code: $EXIT_CODE${NC}"
     echo "Check CloudWatch logs: /ecs/${PROJECT}"
     exit 1
 fi
@@ -159,9 +159,9 @@ EXIT_CODE=$(aws ecs describe-tasks \
     --output text)
 
 if [[ "$EXIT_CODE" == "0" ]]; then
-    echo -e "${GREEN}✅ Admin user created${NC}"
+    echo -e "${GREEN}âœ… Admin user created${NC}"
 else
-    echo -e "${YELLOW}⚠️  User creation exit code: $EXIT_CODE (may already exist)${NC}"
+    echo -e "${YELLOW}âš ï¸  User creation exit code: $EXIT_CODE (may already exist)${NC}"
 fi
 echo ""
 
@@ -170,16 +170,16 @@ echo ""
 # ============================================
 echo ""
 echo "=========================================="
-echo "🎉 Airflow Initialization Complete!"
+echo "ðŸŽ‰ Airflow Initialization Complete!"
 echo "=========================================="
 echo ""
 echo "Airflow is ready to use!"
 echo ""
 echo "Access Information:"
-echo "  🌐 URL:      http://$ALB_DNS"
-echo "  👤 Username: $AIRFLOW_ADMIN_USER"
-echo "  🔑 Password: $AIRFLOW_ADMIN_PASSWORD"
+echo "  ðŸŒ URL:      http://$ALB_DNS"
+echo "  ðŸ‘¤ Username: $AIRFLOW_ADMIN_USER"
+echo "  ðŸ”‘ Password: $AIRFLOW_ADMIN_PASSWORD"
 echo ""
-echo -e "${YELLOW}⚠️  Change the admin password after first login!${NC}"
+echo -e "${YELLOW}âš ï¸  Change the admin password after first login!${NC}"
 echo ""
-echo -e "${YELLOW}📝 Next step: ./80_airflow_vars.sh${NC}"
+echo -e "${YELLOW}ðŸ“ Next step: ./80_airflow_vars.sh${NC}"

@@ -13,7 +13,7 @@ export AWS_PAGER=""
 source "$(dirname "$0")/00_env.sh"
 [[ -f "$(dirname "$0")/.env.out" ]] && source "$(dirname "$0")/.env.out"
 
-echo "⚠️  WARNING: DESTRUCTIVE CLEANUP"
+echo "âš ï¸  WARNING: DESTRUCTIVE CLEANUP"
 echo "================================"
 echo ""
 echo "This will DELETE all resources created by the deployment:"
@@ -44,7 +44,7 @@ if [[ "$CONFIRM" != "DELETE" ]]; then
 fi
 
 echo ""
-echo "🗑️  Starting cleanup..."
+echo "ðŸ—‘ï¸  Starting cleanup..."
 echo ""
 
 # ============================================
@@ -85,7 +85,7 @@ for service in "${SERVICES[@]}"; do
             --region "$AWS_REGION" \
             --no-cli-pager >/dev/null 2>&1 || true
         
-        echo -e "${GREEN}✅ Deleted: $service${NC}"
+        echo -e "${GREEN}âœ… Deleted: $service${NC}"
     else
         echo "Service not found: $service"
     fi
@@ -115,7 +115,7 @@ if [[ -n "$TASKS" ]]; then
             --region "$AWS_REGION" \
             --no-cli-pager >/dev/null 2>&1 || true
     done
-    echo -e "${GREEN}✅ All tasks stopped${NC}"
+    echo -e "${GREEN}âœ… All tasks stopped${NC}"
 else
     echo "No running tasks found"
 fi
@@ -138,7 +138,7 @@ if aws ecs describe-clusters \
         --region "$AWS_REGION" \
         --no-cli-pager >/dev/null 2>&1 || true
     
-    echo -e "${GREEN}✅ Deleted ECS cluster${NC}"
+    echo -e "${GREEN}âœ… Deleted ECS cluster${NC}"
 else
     echo "Cluster not found: $CLUSTER_NAME"
 fi
@@ -156,7 +156,7 @@ if [[ -n "${LISTENER_ARN:-}" ]]; then
         --region "$AWS_REGION" \
         --no-cli-pager >/dev/null 2>&1 || true
     
-    echo -e "${GREEN}✅ Deleted ALB listener${NC}"
+    echo -e "${GREEN}âœ… Deleted ALB listener${NC}"
 else
     echo "Listener ARN not found in .env.out"
 fi
@@ -186,7 +186,7 @@ for tg_name in "${TG_NAMES[@]}"; do
             --region "$AWS_REGION" \
             --no-cli-pager >/dev/null 2>&1 || true
         
-        echo -e "${GREEN}✅ Deleted: $tg_name${NC}"
+        echo -e "${GREEN}âœ… Deleted: $tg_name${NC}"
     else
         echo "Target group not found: $tg_name"
     fi
@@ -215,7 +215,7 @@ if [[ "$ALB_ARN" != "None" ]]; then
     echo "Waiting for ALB to be deleted..."
     sleep 10
     
-    echo -e "${GREEN}✅ Deleted ALB${NC}"
+    echo -e "${GREEN}âœ… Deleted ALB${NC}"
 else
     echo "ALB not found: $ALB_NAME"
 fi
@@ -238,7 +238,7 @@ if aws logs describe-log-groups \
         --region "$AWS_REGION" \
         --no-cli-pager >/dev/null 2>&1 || true
     
-    echo -e "${GREEN}✅ Deleted log group${NC}"
+    echo -e "${GREEN}âœ… Deleted log group${NC}"
 else
     echo "Log group not found: $LOG_GROUP"
 fi
@@ -294,7 +294,7 @@ for role in "${IAM_ROLES[@]}"; do
             --region "$AWS_REGION" \
             --no-cli-pager >/dev/null 2>&1 || true
         
-        echo -e "${GREEN}✅ Deleted: $role${NC}"
+        echo -e "${GREEN}âœ… Deleted: $role${NC}"
     else
         echo "IAM role not found: $role"
     fi
@@ -329,7 +329,7 @@ for sg_name in "${SG_NAMES[@]}"; do
             --region "$AWS_REGION" \
             --no-cli-pager >/dev/null 2>&1 || true
         
-        echo -e "${GREEN}✅ Deleted: $sg_name${NC}"
+        echo -e "${GREEN}âœ… Deleted: $sg_name${NC}"
     else
         echo "Security group not found: $sg_name"
     fi
@@ -364,7 +364,7 @@ for repo in "${ECR_REPOS[@]}"; do
             --region "$AWS_REGION" \
             --no-cli-pager >/dev/null 2>&1 || true
         
-        echo -e "${GREEN}✅ Deleted: $repo${NC}"
+        echo -e "${GREEN}âœ… Deleted: $repo${NC}"
     else
         echo "ECR repository not found: $repo"
     fi
@@ -376,21 +376,21 @@ echo ""
 # ============================================
 echo ""
 echo "=========================================="
-echo "🎉 Cleanup Complete!"
+echo "ðŸŽ‰ Cleanup Complete!"
 echo "=========================================="
 echo ""
 echo "Deleted Resources:"
-echo "  ✅ ECS Services (4)"
-echo "  ✅ ECS Tasks"
-echo "  ✅ ECS Cluster"
-echo "  ✅ Application Load Balancer"
-echo "  ✅ Target Groups (2)"
-echo "  ✅ CloudWatch Log Group"
-echo "  ✅ IAM Roles (2)"
-echo "  ✅ Security Groups (2)"
-echo "  ✅ ECR Repositories (5)"
+echo "  âœ… ECS Services (4)"
+echo "  âœ… ECS Tasks"
+echo "  âœ… ECS Cluster"
+echo "  âœ… Application Load Balancer"
+echo "  âœ… Target Groups (2)"
+echo "  âœ… CloudWatch Log Group"
+echo "  âœ… IAM Roles (2)"
+echo "  âœ… Security Groups (2)"
+echo "  âœ… ECR Repositories (5)"
 echo ""
-echo "⚠️  Manual Cleanup Required:"
+echo "âš ï¸  Manual Cleanup Required:"
 echo ""
 echo "1. Delete ElastiCache Redis:"
 echo "   aws elasticache delete-cache-cluster \\"
