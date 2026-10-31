@@ -1,0 +1,67 @@
+services:
+  # ==============================================================================
+  # Local PostgreSQL Database for Analytics & Grafana (No AWS RDS needed!)
+  # ==============================================================================
+  churn-postgres:
+    image: postgres:15-alpine
+    container_name: churn-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgrespostgres
+      - POSTGRES_DB=churn_analytics
+    ports:
+      - "5432:5432"
+    volumes:
+      - churn-postgres-data:/var/lib/postgresql/data
+      - ./sql/create_analytics_tables.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    networks:
+      - churn-pipeline-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d churn_analytics"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ==============================================================================
+  # Grafana Dashboard UI
+  # ==============================================================================
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: churn-grafana
+    restart: unless-stopped
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/customer_churn_analytics.json
+      # Connect to local churn-postgres container
+      - RDS_HOST=churn-postgres
+      - RDS_PORT=5432
+      - RDS_ANALYTICS_DB=churn_analytics
+      - RDS_USERNAME=postgres
+      - RDS_PASSWORD=postgrespostgres
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - churn-pipeline-network
+    depends_on:
+      churn-postgres:
+        condition: service_healthy
+
+networks:
+  churn-pipeline-network:
+    name: churn-pipeline-network
+    external: true
+
+volumes:
+  churn-postgres-data:
+    driver: local
+  grafana-storage:
+    driver: local

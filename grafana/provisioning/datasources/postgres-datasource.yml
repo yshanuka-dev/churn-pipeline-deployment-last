@@ -1,0 +1,21 @@
+apiVersion: 1
+
+datasources:
+  - name: PostgreSQL-Churn-Analytics
+    type: postgres
+    uid: churn-postgres-ds
+    access: proxy
+    url: ${RDS_HOST}:${RDS_PORT}
+    database: ${RDS_ANALYTICS_DB}
+    user: ${RDS_USERNAME}
+    secureJsonData:
+      password: ${RDS_PASSWORD}
+    jsonData:
+      sslmode: 'disable'
+      maxOpenConns: 10
+      maxIdleConns: 5
+      connMaxLifetime: 14400
+      postgresVersion: 1500
+    isDefault: true
+    editable: true
+

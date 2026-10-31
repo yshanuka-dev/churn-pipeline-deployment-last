@@ -121,9 +121,9 @@ services:
       MLFLOW_TRACKING_URI: http://mlflow-tracking:5001
       
       # RDS database
-      RDS_HOST: ${RDS_HOST}
+      RDS_HOST: ${RDS_HOST:-churn-postgres}
       RDS_PORT: ${RDS_PORT:-5432}
-      RDS_DB_NAME: ${RDS_DB_NAME}
+      RDS_DB_NAME: ${RDS_ANALYTICS_DB:-churn_analytics}
       RDS_USERNAME: ${RDS_USERNAME}
       RDS_PASSWORD: ${RDS_PASSWORD}
       
@@ -155,9 +155,9 @@ services:
       S3_BUCKET: ${S3_BUCKET}
       
       # RDS database
-      RDS_HOST: ${RDS_HOST}
+      RDS_HOST: ${RDS_HOST:-churn-postgres}
       RDS_PORT: ${RDS_PORT:-5432}
-      RDS_DB_NAME: ${RDS_DB_NAME}
+      RDS_DB_NAME: ${RDS_ANALYTICS_DB:-churn_analytics}
       RDS_USERNAME: ${RDS_USERNAME}
       RDS_PASSWORD: ${RDS_PASSWORD}
       

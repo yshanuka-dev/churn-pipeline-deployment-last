@@ -770,6 +770,50 @@ setup-analytics-tables:
 	@echo "✅ Analytics tables created"
 
 # ========================================================================================
+# GRAFANA MONITORING & DASHBOARDS
+# ========================================================================================
+
+GRAFANA_COMPOSE = docker-compose.grafana.yml
+GRAFANA_PORT ?= 3000
+
+# Start Grafana
+grafana-up:
+	@echo "📊 Starting Grafana..."
+	docker-compose -f $(GRAFANA_COMPOSE) up -d
+	@echo ""
+	@echo "✅ Grafana started!"
+	@echo "💡 URL: http://localhost:$(GRAFANA_PORT)"
+	@echo "💡 Default credentials: admin / admin"
+	@echo "💡 Pre-provisioned dashboard: Customer Churn Prediction and Analytics"
+
+# Stop Grafana
+grafana-down:
+	@echo "⏹️  Stopping Grafana..."
+	docker-compose -f $(GRAFANA_COMPOSE) down
+	@echo "✅ Grafana stopped"
+
+# Restart Grafana
+grafana-restart: grafana-down grafana-up
+	@echo "✅ Grafana restarted"
+
+# View Grafana logs
+grafana-logs:
+	@docker-compose -f $(GRAFANA_COMPOSE) logs -f
+
+# Grafana status
+grafana-status:
+	@docker-compose -f $(GRAFANA_COMPOSE) ps
+
+# Populate local PostgreSQL with predictions (from S3 or local data)
+grafana-populate:
+	@echo "📥 Populating local PostgreSQL with churn predictions..."
+	$(PYTHON) scripts/load_data_to_postgres.py
+
+# Open Grafana UI in browser
+grafana-ui:
+	@open http://localhost:$(GRAFANA_PORT) || xdg-open http://localhost:$(GRAFANA_PORT) || start http://localhost:$(GRAFANA_PORT) || echo "Please open http://localhost:$(GRAFANA_PORT) in your browser"
+
+# ========================================================================================
 # NUCLEAR DOCKER CLEANUP (WARNING: DESTROYS EVERYTHING)
 # ========================================================================================
 
